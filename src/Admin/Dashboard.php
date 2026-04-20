@@ -141,24 +141,44 @@ class Dashboard {
 
                     <!-- Tab PRO -->
                     <div id="tab-pro" class="sts-tab-content">
-                        <div style="text-align:center; padding:50px;">
-                            <h2 style="font-size:32px; color:#d63638;">🚀 <?php _e('Unlock the Full Power of Scout PRO', 'seo-cannibalization-scout'); ?></h2>
-                            <p style="font-size:18px;"><?php _e('Make data-driven decisions with real traffic statistics.', 'seo-cannibalization-scout'); ?></p>
-                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-top:40px; text-align:left;">
-                                <div style="padding:20px; background:#fff; border:1px solid #ddd; border-radius:10px;">
-                                    <h4>📈 GSC Performance</h4>
-                                    <p><?php _e('See exact clicks and impressions for each conflicting URL directly in your audit.', 'seo-cannibalization-scout'); ?></p>
+                        <div style="text-align:center; padding:40px 20px;">
+                            <span style="background:#fff2f2; color:#d63638; padding:5px 15px; border-radius:20px; font-weight:bold; font-size:12px; text-transform:uppercase; letter-spacing:1px;"><?php _e('Limited Time Offer', 'seo-cannibalization-scout'); ?></span>
+                            <h2 style="font-size:36px; color:#1d2327; margin-top:15px; font-weight:800;"><?php _e('Pare de Perder Autoridade e Tráfego!', 'seo-cannibalization-scout'); ?></h2>
+                            <p style="font-size:18px; color:#666; max-width:800px; margin:0 auto 40px auto;"><?php _e('Você está deixando o Google decidir o destino do seu site. Com a versão PRO, você assume o controle total usando dados reais do Search Console.', 'seo-cannibalization-scout'); ?></p>
+                            
+                            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:50px; text-align:left;">
+                                <div style="padding:25px; background:#fff; border:1px solid #e2e8f0; border-radius:15px; transition:0.3s;" class="pro-feature-card">
+                                    <div style="font-size:30px; margin-bottom:15px;">📊</div>
+                                    <h4 style="margin:0 0 10px 0; font-size:18px; color:#1d2327;"><?php _e('Inteligência GSC Real', 'seo-cannibalization-scout'); ?></h4>
+                                    <p style="margin:0; font-size:14px; color:#64748b; line-height:1.5;"><?php _e('Veja exatamente quantos cliques e impressões cada URL recebeu nos últimos 90 dias. Nunca mais redirecione a página errada.', 'seo-cannibalization-scout'); ?></p>
                                 </div>
-                                <div style="padding:20px; background:#fff; border:1px solid #ddd; border-radius:10px;">
-                                    <h4>⚡ Bulk Fixer</h4>
-                                    <p><?php _e('Resolve hundreds of conflicts with a single click. Save hours of manual work.', 'seo-cannibalization-scout'); ?></p>
+                                <div style="padding:25px; background:#fff; border:1px solid #e2e8f0; border-radius:15px; transition:0.3s;" class="pro-feature-card">
+                                    <div style="font-size:30px; margin-bottom:15px;">⚡</div>
+                                    <h4 style="margin:0 0 10px 0; font-size:18px; color:#1d2327;"><?php _e('Resolução em Massa', 'seo-cannibalization-scout'); ?></h4>
+                                    <p style="margin:0; font-size:14px; color:#64748b; line-height:1.5;"><?php _e('Economize horas de trabalho manual. Resolva dezenas de conflitos de canibalização com apenas um clique.', 'seo-cannibalization-scout'); ?></p>
                                 </div>
-                                <div style="padding:20px; background:#fff; border:1px solid #ddd; border-radius:10px;">
-                                    <h4>📅 Auto-Monitoring</h4>
-                                    <p><?php _e('Schedule weekly scans and receive email alerts whenever new cannibalization is detected.', 'seo-cannibalization-scout'); ?></p>
+                                <div style="padding:25px; background:#fff; border:1px solid #e2e8f0; border-radius:15px; transition:0.3s;" class="pro-feature-card">
+                                    <div style="font-size:30px; margin-bottom:15px;">🛡️</div>
+                                    <h4 style="margin:0 0 10px 0; font-size:18px; color:#1d2327;"><?php _e('Monitoramento Ativo', 'seo-cannibalization-scout'); ?></h4>
+                                    <p style="margin:0; font-size:14px; color:#64748b; line-height:1.5;"><?php _e('Receba alertas automáticos quando novos conflitos surgirem após você publicar novos conteúdos.', 'seo-cannibalization-scout'); ?></p>
                                 </div>
                             </div>
-                            <a href="#" class="button button-primary button-large" style="margin-top:40px; padding:10px 40px; height:auto; font-size:20px; background:#d63638 !important; border-color:#d63638 !important;"><?php _e('Get PRO License Now', 'seo-cannibalization-scout'); ?></a>
+
+                            <div style="background:#1d2327; padding:40px; border-radius:20px; color:#fff; max-width:600px; margin:0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                                <h3 style="color:#fff; margin-top:0; font-size:24px;"><?php _e('Torne-se PRO por apenas', 'seo-cannibalization-scout'); ?></h3>
+                                <div style="font-size:64px; font-weight:900; color:#fff; margin:10px 0;">$5<span style="font-size:20px; font-weight:400; opacity:0.7;">/ano</span></div>
+                                <p style="opacity:0.8; margin-bottom:30px;"><?php _e('Menos de 2 reais por mês para proteger todo o seu SEO.', 'seo-cannibalization-scout'); ?></p>
+                                
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=SEU_EMAIL_PAYPAL&item_name=Scout+PRO+License&amount=5.00&currency_code=USD" target="_blank" class="button button-primary" style="background:#fff !important; color:#1d2327 !important; border:none !important; padding:15px 50px !important; font-size:18px !important; font-weight:bold !important; height:auto !important; border-radius:10px !important; box-shadow: 0 4px 15px rgba(255,255,255,0.2);">
+                                    <?php _e('🛒 Adquirir Licença PRO (PayPal)', 'seo-cannibalization-scout'); ?>
+                                </a>
+                                
+                                <div style="margin-top:20px; font-size:12px; opacity:0.6; display:flex; align-items:center; justify-content:center; gap:10px;">
+                                    <span>✅ Ativação Instantânea</span>
+                                    <span>✅ Suporte Prioritário</span>
+                                    <span>✅ 7 Dias de Garantia</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
