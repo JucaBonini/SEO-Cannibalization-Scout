@@ -33,7 +33,7 @@ class Dashboard {
         $token = json_decode(wp_remote_retrieve_body($resp),true)['access_token'] ?? '';
         if (!$token) return [];
         $site = urlencode(trailingslashit(home_url()));
-        $perf = wp_remote_post("https://www.googleapis.com/webmasters/v3/sites/{$site}/searchAnalytics/query", ['headers'=>['Authorization'=>'Bearer '.$token,'Content-Type'=>'application/json'],'body'=>json_encode(['startDate'=>date('Y-m-d',strtotime('-30 days')),'endDate'=>date('Y-m-d'),'dimensions'=>['page'],'rowLimit'=>5000])]);
+        $perf = wp_remote_post("https://www.googleapis.com/webmasters/v3/sites/{$site}/searchAnalytics/query", ['headers'=>['Authorization'=>'Bearer '.$token,'Content-Type'=>'application/json'],'body'=>json_encode(['startDate'=>date('Y-m-d',strtotime('-30 days')),'endDate'=>date('Y-m-d'),'dimensions' => ['page'],'rowLimit'=>5000])]);
         if (is_wp_error($perf)) return [];
         $rows = json_decode(wp_remote_retrieve_body($perf),true)['rows'] ?? [];
         $map = []; foreach($rows as $r) { $map[$r['keys'][0]] = ['clicks'=>$r['clicks'],'impressions'=>$r['impressions']]; }
@@ -75,6 +75,8 @@ class Dashboard {
             .sts-vs-icon { background:#d63638; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; }
             .sts-stat-box { background:#f6f7f7; padding:15px; border-radius:4px; flex:1; text-align:center; border:1px solid #dcdcde; }
             .sts-stat-num { display:block; font-size:28px; font-weight:700; color:#d63638; }
+            .sts-step-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:15px; position:relative; }
+            .sts-step-num { position:absolute; left:-12px; top:15px; background:#d63638; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
             @media (max-width: 782px) { .sts-scout-header { flex-direction:column; align-items:flex-start; gap:20px; } .sts-conflict-grid { grid-template-columns:1fr; } }
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
             .sts-modal-content { background:#fff; margin:10% auto; padding:30px; border-radius:12px; width:550px; }
@@ -91,23 +93,17 @@ class Dashboard {
                     <div style="display:flex; align-items:center; gap:20px;">
                         <div>
                             <h2>SEO Cannibalization Scout</h2>
-                            <p>Professional Detection & Resolve Tool</p>
+                            <p>Ultimate SEO Authority Auditor</p>
                         </div>
                         <div class="sts-help-trigger" onclick="jQuery('#sts-help-modal').fadeIn()">?</div>
-                    </div>
-                    <div class="sts-header-actions">
-                        <select class="sts-lang-selector" id="sts-scout-lang-switch">
-                            <option value="pt_BR" <?php selected($current_lang,'pt_BR');?>>🇧🇷 PT</option>
-                            <option value="en_US" <?php selected($current_lang,'en_US');?>>🇺🇸 EN</option>
-                        </select>
                     </div>
                 </div>
                 
                 <div class="sts-scout-content">
                     <div class="sts-scout-tabs">
-                        <div class="sts-tab-link active" data-tab="audit"><?php _e('Audit','seo-cannibalization-scout');?></div>
+                        <div class="sts-tab-link active" data-tab="audit"><?php _e('Audit Dashboard','seo-cannibalization-scout');?></div>
                         <div class="sts-tab-link" data-tab="settings"><?php _e('GSC Integration','seo-cannibalization-scout');?> <?php echo $is_authed?'✅':'';?></div>
-                        <div class="sts-tab-link" data-tab="support"><?php _e('Review & Support','seo-cannibalization-scout');?></div>
+                        <div class="sts-tab-link" data-tab="support"><?php _e('Support','seo-cannibalization-scout');?></div>
                     </div>
 
                     <div id="tab-audit" class="sts-tab-content active">
@@ -128,42 +124,71 @@ class Dashboard {
                     </div>
 
                     <div id="tab-settings" class="sts-tab-content">
-                        <div style="display:grid; grid-template-columns: 1fr 350px; gap:40px;">
+                        <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
-                                <h3><?php _e('Como conectar ao Google Search Console','seo-cannibalization-scout');?></h3>
-                                <p style="color:#666;"><?php _e('Siga os passos para liberar os dados de cliques e impressões.','seo-cannibalization-scout');?></p>
-                                <div style="margin-top:20px;">
-                                    <strong>1. Google Cloud Console:</strong> Crie um projeto "Scout SEO".<br><br>
-                                    <strong>2. Ative as APIs:</strong> "Google Search Console API".<br><br>
-                                    <strong>3. OAuth Redirect URI:</strong><br>
-                                    <code style="background:#f1f1f1; padding:5px;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
+                                <h3 style="margin-top:0;">🛑 Guia Passo-a-Passo (Para Iniciantes)</h3>
+                                <p style="color:#666; margin-bottom:30px;">O Google não libera seus dados sem permissão. Siga estes 4 passos simples:</p>
+                                
+                                <div class="sts-step-card">
+                                    <div class="sts-step-num">1</div>
+                                    <strong>Acesse o Google Cloud</strong><br>
+                                    <span style="font-size:12px;">Vá em <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> e clique em "Criar Projeto". Dê o nome de <b>Scout SEO</b>.</span>
+                                </div>
+
+                                <div class="sts-step-card">
+                                    <div class="sts-step-num">2</div>
+                                    <strong>Ative a API do Search Console</strong><br>
+                                    <span style="font-size:12px;">No menu lateral, vá em "APIs e Serviços" > "Biblioteca". Procure por <b>Google Search Console API</b> e clique em Ativar.</span>
+                                </div>
+
+                                <div class="sts-step-card">
+                                    <div class="sts-step-num">3</div>
+                                    <strong>Crie as Credenciais (OAuth)</strong><br>
+                                    <span style="font-size:12px;">Vá em "Credenciais" > "Criar Credenciais" > "ID do cliente OAuth". Escolha "Aplicativo Web".</span>
+                                </div>
+
+                                <div class="sts-step-card" style="background:#fff9e6;">
+                                    <div class="sts-step-num">4</div>
+                                    <strong>Configure a URI de Redirecionamento (MUITO IMPORTANTE!)</strong><br>
+                                    <span style="font-size:12px;">No campo "URIs de redirecionamento autorizados", cole o link abaixo:</span><br>
+                                    <code style="display:block; background:#fff; padding:10px; margin-top:10px; border:1px solid #ddd; word-break:break-all;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
                                 </div>
                             </div>
-                            <div style="background:#f6f7f7; padding:30px; border-radius:15px; border:1px solid #ddd;">
-                                <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
-                                <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
-                                <button class="button button-primary" style="width:100%" id="save-gsc-btn">Save & Authorize</button>
+
+                            <div style="background:#f6f7f7; padding:30px; border-radius:15px; border:1px solid #ddd; height:fit-content;">
+                                <h4 style="margin-top:0;">Cole seus dados aqui:</h4>
+                                <label style="display:block; margin-bottom:15px;">
+                                    <strong>Google Client ID:</strong><br>
+                                    <input type="text" id="gsc-client-id" style="width:100%" placeholder="Cole o ID que termina em .apps.googleusercontent.com" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>">
+                                </label>
+                                <label style="display:block; margin-bottom:20px;">
+                                    <strong>Google Client Secret:</strong><br>
+                                    <input type="password" id="gsc-client-secret" style="width:100%" placeholder="Cole sua chave secreta aqui" value="********">
+                                </label>
+                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-btn">🚀 Salvar e Autorizar Google</button>
+                                <p style="font-size:11px; color:#888; text-align:center; margin-top:15px;">Ao clicar, você será levado para o Google para confirmar o acesso.</p>
                             </div>
                         </div>
                     </div>
 
                     <div id="tab-support" class="sts-tab-content">
                         <div style="text-align:center; padding:30px;">
-                             <h3>Support & Donations</h3>
-                             <p>Buy the developer a coffee!</p>
-                             <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=5.00&currency_code=USD" target="_blank" class="button button-primary">$5.00</a>
+                             <h3>Review & Support</h3>
+                             <p>Help us stay free for everyone!</p>
+                             <a href="https://wordpress.org/support/plugin/seo-cannibalization-scout/reviews/" target="_blank" class="button button-primary">Rate 5 Stars</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="sts-help-modal" class="sts-audit-modal"><div class="sts-modal-content"><h3>Surgical Audit Help</h3><p>Compare URL types and metrics to resolve conflicts correctly.</p><button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary">Close</button></div></div>
+            <div id="sts-help-modal" class="sts-audit-modal"><div class="sts-modal-content"><h3>Surgical Audit Help</h3><p>Compare clicks and impressions to decide which URL should be the Master.</p><button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary">Got it!</button></div></div>
             <div id="sts-resolve-modal" class="sts-audit-modal">
                 <div class="sts-modal-content">
-                    <h3>Resolve Conflict</h3>
+                    <h3>Confirmar Resolução</h3>
+                    <p>Deseja aplicar o Redirecionamento Canonical para a URL vencedora?</p>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;">
-                        <button class="button" onclick="jQuery('#sts-resolve-modal').fadeOut()">Cancel</button>
-                        <button class="button button-primary" id="final-resolve-btn">Confirm Canonical</button>
+                        <button class="button" onclick="jQuery('#sts-resolve-modal').fadeOut()">Cancelar</button>
+                        <button class="button button-primary" id="final-resolve-btn">Sim, Aplicar Dados</button>
                     </div>
                 </div>
             </div>
@@ -219,15 +244,14 @@ class Dashboard {
     public function ajax_save_gsc() {
         update_option('sts_scout_gsc_client_id', sanitize_text_field($_POST['client_id']));
         update_option('sts_scout_gsc_client_secret', sanitize_text_field($_POST['client_secret']));
-        $id = get_option('sts_scout_gsc_client_id');
-        $red = urlencode(admin_url('admin.php?page=seo-cannibalization-scout'));
+        $id = get_option('sts_scout_gsc_client_id'); $red = urlencode(admin_url('admin.php?page=seo-cannibalization-scout'));
         $url = "https://accounts.google.com/o/oauth2/v2/auth?client_id={$id}&redirect_uri={$red}&response_type=code&scope=".urlencode('https://www.googleapis.com/auth/webmasters.readonly')."&access_type=offline&prompt=consent";
         wp_send_json_success(['auth_url'=>$url]);
     }
 
     public function ajax_run_audit() {
         check_ajax_referer('cannibal_audit_nonce');
-        $types = isset($_POST['types']) ? $_POST['types'] : ['post','page'];
+        $types = $_POST['types']??['post','page'];
         $posts = get_posts(['post_type'=>$types,'posts_per_page'=>-1,'post_status'=>'publish','fields'=>'ids']);
         $gsc = $this->get_gsc_performance_data();
         $conflicts=[]; $map=[]; $pat = '/-(receita|facil|caseiro)$/';
