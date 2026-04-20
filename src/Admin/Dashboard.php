@@ -169,7 +169,7 @@ class Dashboard {
                                 <div style="font-size:64px; font-weight:900; color:#fff; margin:10px 0;">$5<span style="font-size:20px; font-weight:400; opacity:0.7;">/ano</span></div>
                                 <p style="opacity:0.8; margin-bottom:30px;"><?php _e('Menos de 2 reais por mês para proteger todo o seu SEO.', 'seo-cannibalization-scout'); ?></p>
                                 
-                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=SEU_EMAIL_PAYPAL&item_name=Scout+PRO+License&amount=5.00&currency_code=USD" target="_blank" class="button button-primary" style="background:#fff !important; color:#1d2327 !important; border:none !important; padding:15px 50px !important; font-size:18px !important; font-weight:bold !important; height:auto !important; border-radius:10px !important; box-shadow: 0 4px 15px rgba(255,255,255,0.2);">
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Scout+PRO+License&amount=5.00&currency_code=USD" target="_blank" class="button button-primary" style="background:#fff !important; color:#1d2327 !important; border:none !important; padding:15px 50px !important; font-size:18px !important; font-weight:bold !important; height:auto !important; border-radius:10px !important; box-shadow: 0 4px 15px rgba(255,255,255,0.2);">
                                     <?php _e('🛒 Adquirir Licença PRO (PayPal)', 'seo-cannibalization-scout'); ?>
                                 </a>
                                 
