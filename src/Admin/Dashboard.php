@@ -69,17 +69,18 @@ class Dashboard {
             .sts-conflict-item { background:#fff; border:1px solid #ccd0d4; padding:25px; margin-bottom:15px; border-radius:8px; border-left:6px solid #d63638; display:flex; justify-content:space-between; align-items:center; }
             .sts-conflict-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; width:100%; }
             .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; }
-            .sts-type-tag { font-size:10px; text-transform:uppercase; font-weight:bold; padding:2px 6px; border-radius:4px; margin-bottom:8px; display:inline-block; }
-            .sts-type-post { background:#e0f2fe; color:#0369a1; }
-            .sts-type-story { background:#fef3c7; color:#92400e; }
             .sts-vs-icon { background:#d63638; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; }
             .sts-stat-box { background:#f6f7f7; padding:15px; border-radius:4px; flex:1; text-align:center; border:1px solid #dcdcde; }
             .sts-stat-num { display:block; font-size:28px; font-weight:700; color:#d63638; }
             .sts-loading-area { text-align:center; padding:50px; display:none; }
             .sts-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #d63638; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .sts-step-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:15px; position:relative; }
-            .sts-step-num { position:absolute; left:-12px; top:15px; background:#d63638; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; }
+            .sts-tuto-step { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:25px; margin-bottom:20px; position:relative; box-shadow:0 2px 4px rgba(0,0,0,0.02); }
+            .sts-tuto-num { background:#d63638; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:15px; box-shadow:0 2px 5px rgba(214,54,56,0.3); }
+            .sts-tuto-step h4 { margin:0 0 10px 0; color:#1a1d23; font-size:16px; }
+            .sts-tuto-step p { margin:0; color:#64748b; font-size:13px; line-height:1.6; }
+            .sts-copy-block { background:#f1f5f9; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-top:15px; display:flex; justify-content:space-between; align-items:center; }
+            .sts-copy-block code { font-size:11px; color:#475569; word-break:break-all; }
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
             .sts-modal-content { background:#fff; margin:10% auto; padding:35px; border-radius:12px; width:650px; max-width:90%; position:relative; }
         ");
@@ -102,13 +103,13 @@ class Dashboard {
                 
                 <div class="sts-scout-content">
                     <div class="sts-scout-tabs">
-                        <div class="sts-tab-link active" data-tab="audit"><?php _e('Audit Dashboard','seo-cannibalization-scout');?></div>
-                        <div class="sts-tab-link" data-tab="settings"><?php _e('GSC Integration','seo-cannibalization-scout');?> <?php echo $is_authed?'✅':'';?></div>
-                        <div class="sts-tab-link" data-tab="support"><?php _e('Support','seo-cannibalization-scout');?></div>
+                        <div class="sts-tab-link active" data-tab="audit">Audit Dashboard</div>
+                        <div class="sts-tab-link" data-tab="settings">GSC Integration <?php echo $is_authed?'✅':'';?></div>
+                        <div class="sts-tab-link" data-tab="support">Support</div>
                     </div>
 
                     <div id="tab-audit" class="sts-tab-content active">
-                        <p><strong><?php _e('Select content types:','seo-cannibalization-scout');?></strong></p>
+                        <p><strong>Select content types:</strong></p>
                         <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
                             <?php
                             $pts = get_post_types(['public'=>true],'objects');
@@ -121,28 +122,63 @@ class Dashboard {
                             <?php endforeach;?>
                         </div>
                         <button class="button button-primary button-large" id="run-scout-btn">🚀 Start Surgical Scan</button>
-                        
-                        <div id="sts-loader" class="sts-loading-area">
-                            <div class="sts-spinner"></div>
-                            <h3 style="margin-bottom:5px;">Scout está trabalhando...</h3>
-                            <p style="color:#666;">Varrendo seu conteúdo e cruzando dados com o Google.</p>
-                        </div>
-
+                        <div id="sts-loader" class="sts-loading-area"><div class="sts-spinner"></div><h3>Scout está trabalhando...</h3><p>Varrendo seu conteúdo e cruzando dados com o Google.</p></div>
                         <div id="scout-results" style="margin-top:30px;"></div>
                     </div>
 
+                    <!-- Tutorial Master GSC -->
                     <div id="tab-settings" class="sts-tab-content">
                         <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
-                                <h3 style="margin-top:0;">🛑 Guia Passo-a-Passo (Para Iniciantes)</h3>
-                                <div class="sts-step-card"><div class="sts-step-num">1</div><strong>Acesse o Google Cloud</strong><br><span style="font-size:12px;">Vá em <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> e crie o projeto <b>Scout SEO</b>.</span></div>
-                                <div class="sts-step-card"><div class="sts-step-num">2</div><strong>Ative a API</strong><br><span style="font-size:12px;">Ative a <b>Google Search Console API</b> na biblioteca.</span></div>
-                                <div class="sts-step-card" style="background:#fff9e6;"><div class="sts-step-num">3</div><strong>Redirect URI:</strong><br><code style="display:block; background:#fff; padding:10px; margin-top:10px; border:1px solid #ddd; font-size:11px; word-break:break-all;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code></div>
+                                <h3 style="margin-top:0;">🏁 Guia Completo de Configuração Google</h3>
+                                <p style="color:#64748b; margin-bottom:25px;">Siga cada passo abaixo para conectar seu site ao Google Search Console.</p>
+
+                                <div class="sts-tuto-step">
+                                    <div class="sts-tuto-num">1</div>
+                                    <h4>Criar Projeto no Google Cloud</h4>
+                                    <p>Acesse o <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>. No topo da tela, clique em <b>"Selecionar um projeto"</b> (ou no nome do projeto atual) e depois em <b>"Novo Projeto"</b>. Nomeie como <strong>"Scout SEO"</strong>.</p>
+                                </div>
+
+                                <div class="sts-tuto-step">
+                                    <div class="sts-tuto-num">2</div>
+                                    <h4>Ativar a API do Search Console</h4>
+                                    <p>No menu lateral esquerdo (três tracinhos), vá em <b>"APIs e Serviços" > "Biblioteca"</b>. Na barra de busca, digite <strong>"Google Search Console API"</strong>. Clique no resultado e depois em <b>"Ativar"</b>.</p>
+                                </div>
+
+                                <div class="sts-tuto-step">
+                                    <div class="sts-tuto-num">3</div>
+                                    <h4>Configurar Tela de Consentimento</h4>
+                                    <p>Vá em <b>"APIs e Serviços" > "Tela de permissão OAuth"</b>. Selecione <b>"Externo"</b> e clique em Criar. Preencha apenas o nome do app ("Scout") e seu e-mail de suporte. Clique em "Salvar e Continuar" até o final.</p>
+                                </div>
+
+                                <div class="sts-tuto-step" style="border-color:#fbbf24; background:#fffdf5;">
+                                    <div class="sts-tuto-num" style="background:#fbbf24;">4</div>
+                                    <h4>Criar Credenciais (O Passo Chave)</h4>
+                                    <p>Vá em <b>"APIs e Serviços" > "Credenciais"</b>. Clique em <b>"+ Criar Credenciais" > "ID do cliente OAuth"</b>. Tipo de aplicativo: <b>"Aplicativo da Web"</b>.</p>
+                                    <div class="sts-copy-block">
+                                        <div>
+                                            <strong style="color:#111;">URI de Redirecionamento Autorizado:</strong><br>
+                                            <span style="font-size:11px;">Copie este link e cole no campo do Google:</span><br>
+                                            <code id="sts-uri"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div style="background:#f6f7f7; padding:30px; border-radius:15px; border:1px solid #ddd;">
-                                <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
-                                <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
-                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-btn">Salvar e Conectar</button>
+
+                            <div style="background:#f8fafc; padding:30px; border-radius:15px; border:1px solid #e2e8f0; height:fit-content; position:sticky; top:20px;">
+                                <h4 style="margin:0 0 20px 0; border-bottom:1px solid #e2e8f0; padding-bottom:15px;">🔧 Cole os códigos aqui:</h4>
+                                <label style="display:block; margin-bottom:15px;">
+                                    <strong>Google Client ID:</strong><br>
+                                    <input type="text" id="gsc-client-id" style="width:100%; padding:10px;" placeholder="Ex: 12345-abcde.apps.googleusercontent.com" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>">
+                                </label>
+                                <label style="display:block; margin-bottom:20px;">
+                                    <strong>Google Client Secret:</strong><br>
+                                    <input type="password" id="gsc-client-secret" style="width:100%; padding:10px;" placeholder="Sua chave secreta do Google" value="********">
+                                </label>
+                                <button class="button button-primary button-large" style="width:100%; height:50px; font-weight:bold;" id="save-gsc-btn">🚀 SALVAR E CONECTAR GOOGLE</button>
+                                <div style="margin-top:20px; font-size:11px; color:#64748b; line-height:1.4;">
+                                    ℹ️ <b>Dica:</b> Você encontrará estes códigos (Cliente ID e Segredo) na tela final do passo 4 no site do Google.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -152,28 +188,26 @@ class Dashboard {
             <div id="sts-help-modal" class="sts-audit-modal">
                 <div class="sts-modal-content">
                     <h3 style="border-bottom:2px solid #d63638; padding-bottom:10px;">🛡️ Ajuda do Scout</h3>
-                    <p><b>1. O que é Canibalização?</b> Duas URLs competindo pela mesma palavra-chave.</p>
-                    <p><b>2. Como resolver?</b> Use os cliques do Google para decidir qual URL manter como 'Master'.</p>
+                    <p>Aqui você resolve conflitos onde duas URLs competem pelo mesmo termo.</p>
                     <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="width:100%">Fechar</button>
                 </div>
             </div>
-
+            
             <script>
             jQuery(document).ready(function($) {
                 $('.sts-tab-link').on('click', function() {
                     $('.sts-tab-link, .sts-tab-content').removeClass('active');
                     $(this).addClass('active'); $('#tab-'+$(this).data('tab')).addClass('active');
                 });
+                $('#save-gsc-btn').on('click', function() {
+                    $.post(ajaxurl,{action:'sts_cannibal_save_gsc',client_id:$('#gsc-client-id').val(),client_secret:$('#gsc-client-secret').val()},function(res){
+                        if(res.success) window.location.href=res.data.auth_url;
+                    });
+                });
                 $('#run-scout-btn').on('click', function() {
-                    const btn = $(this);
-                    const loader = $('#sts-loader');
-                    const results = $('#scout-results');
+                    const btn = $(this); const loader = $('#sts-loader'); const results = $('#scout-results');
                     const types = $('input[name="post_types[]"]:checked').map(function(){ return $(this).val(); }).get();
-
-                    btn.prop('disabled', true).text('⏳ Scaneando...');
-                    results.fadeOut();
-                    loader.fadeIn();
-
+                    btn.prop('disabled', true).text('⏳ Scaneando...'); results.fadeOut(); loader.fadeIn();
                     $.post(ajaxurl, {action:'sts_cannibal_run_audit', types:types, _ajax_nonce:'<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>'}, function(res) {
                         btn.prop('disabled', false).html('🚀 Start Surgical Scan');
                         loader.fadeOut(function() {
@@ -192,7 +226,7 @@ class Dashboard {
                                                 <div class='sts-gsc-mini-badge'>📊 ${item.gsc2.clicks} clicks</div>
                                             </div>
                                         </div>
-                                        <button class='button resolve-btn' data-index='${index}'>Resolve</button>
+                                        <button class='button resolve-btn' data-index='${index}' style='margin-left:20px;'>Resolve</button>
                                     </div>`;
                                 });
                                 results.html(h).fadeIn(); window.audit_items=res.data.conflicts;
@@ -200,7 +234,6 @@ class Dashboard {
                         });
                     });
                 });
-                $(document).on('click','.resolve-btn',function(){ currentItem=window.audit_items[$(this).data('index')]; currentItem.dom_id='#item-'+$(this).data('index'); $('#sts-resolve-modal').fadeIn(); });
             });
             </script>
         </div>
