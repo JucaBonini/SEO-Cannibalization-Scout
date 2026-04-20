@@ -58,7 +58,6 @@ class Dashboard {
             .sts-scout-card { max-width:1300px; margin:20px auto; border-radius:8px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid #ccd0d4; overflow:hidden; }
             .sts-scout-header { background:#d63638; color:#fff; padding:30px 40px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color:#fff!important; margin:0!important; font-size:26px; }
-            .sts-scout-header p { color:rgba(255,255,255,0.8); margin:5px 0 0 0; font-size:13px; }
             .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; border:1px solid rgba(255,255,255,0.3); }
             .sts-scout-content { padding:30px; }
             .sts-scout-tabs { display:flex; gap:5px; border-bottom:1px solid #ddd; margin-bottom:20px; }
@@ -67,20 +66,21 @@ class Dashboard {
             .sts-tab-content { display:none; }
             .sts-tab-content.active { display:block; }
             .sts-conflict-item { background:#fff; border:1px solid #ccd0d4; padding:25px; margin-bottom:15px; border-radius:8px; border-left:6px solid #d63638; display:flex; justify-content:space-between; align-items:center; }
-            .sts-conflict-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; width:100%; }
-            .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; }
-            .sts-vs-icon { background:#d63638; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; }
+            .sts-conflict-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:15px; align-items:center; width:100%; }
+            .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; position:relative; }
+            .sts-type-tag { font-size:9px; text-transform:uppercase; font-weight:bold; padding:2px 6px; border-radius:4px; margin-bottom:10px; display:inline-block; }
+            .sts-type-post { background:#e0f2fe; color:#0369a1; }
+            .sts-type-story { background:#fef3c7; color:#92400e; }
+            .sts-gsc-stats { display:flex; gap:10px; margin-top:10px; }
+            .sts-mini-stat { background:#fff; border:1px solid #ddd; padding:3px 8px; border-radius:4px; font-size:11px; display:inline-flex; align-items:center; gap:4px; }
+            .sts-vs-icon { background:#d63638; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; }
             .sts-stat-box { background:#f6f7f7; padding:15px; border-radius:4px; flex:1; text-align:center; border:1px solid #dcdcde; }
-            .sts-stat-num { display:block; font-size:28px; font-weight:700; color:#d63638; }
+            .sts-stat-num { display:block; font-size:26px; font-weight:700; color:#d63638; }
             .sts-loading-area { text-align:center; padding:50px; display:none; }
-            .sts-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #d63638; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+            .sts-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #d63638; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .sts-tuto-step { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:25px; margin-bottom:20px; position:relative; box-shadow:0 2px 4px rgba(0,0,0,0.02); }
-            .sts-tuto-num { background:#d63638; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:15px; box-shadow:0 2px 5px rgba(214,54,56,0.3); }
-            .sts-tuto-step h4 { margin:0 0 10px 0; color:#1a1d23; font-size:16px; }
-            .sts-tuto-step p { margin:0; color:#64748b; font-size:13px; line-height:1.6; }
-            .sts-copy-block { background:#f1f5f9; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-top:15px; display:flex; justify-content:space-between; align-items:center; }
-            .sts-copy-block code { font-size:11px; color:#475569; word-break:break-all; }
+            .sts-tuto-step { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:25px; margin-bottom:20px; position:relative; }
+            .sts-tuto-num { background:#d63638; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:15px; }
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
             .sts-modal-content { background:#fff; margin:10% auto; padding:35px; border-radius:12px; width:650px; max-width:90%; position:relative; }
         ");
@@ -93,10 +93,7 @@ class Dashboard {
             <div class="sts-scout-card card">
                 <div class="sts-scout-header">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <div>
-                            <h2>SEO Cannibalization Scout</h2>
-                            <p>Ultimate SEO Authority Auditor</p>
-                        </div>
+                        <div><h2>SEO Cannibalization Scout</h2><p>Ultimate SEO Authority Auditor</p></div>
                         <div class="sts-help-trigger" onclick="jQuery('#sts-help-modal').fadeIn()">?</div>
                     </div>
                 </div>
@@ -110,75 +107,31 @@ class Dashboard {
 
                     <div id="tab-audit" class="sts-tab-content active">
                         <p><strong>Select content types:</strong></p>
-                        <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-                            <?php
-                            $pts = get_post_types(['public'=>true],'objects');
-                            foreach ($pts as $t) : if(in_array($t->name,['attachment','revision','nav_menu_item'])) continue;
-                                $check = in_array($t->name,['post','page']) ? 'checked':'';
-                            ?>
+                        <div style="display:flex; gap:10px; margin-bottom:20px;">
+                            <?php foreach (['post','page','web-story'] as $pt) : ?>
                                 <label style="background:#fff; padding:8px 15px; border:1px solid #ddd; border-radius:5px; cursor:pointer;">
-                                    <input type="checkbox" name="post_types[]" value="<?php echo $t->name;?>" <?php echo $check;?>> <?php echo $t->label;?>
+                                    <input type="checkbox" name="post_types[]" value="<?php echo $pt;?>" <?php checked(in_array($pt,['post','page']));?>> <?php echo ucfirst($pt);?>
                                 </label>
                             <?php endforeach;?>
                         </div>
                         <button class="button button-primary button-large" id="run-scout-btn">🚀 Start Surgical Scan</button>
-                        <div id="sts-loader" class="sts-loading-area"><div class="sts-spinner"></div><h3>Scout está trabalhando...</h3><p>Varrendo seu conteúdo e cruzando dados com o Google.</p></div>
+                        <div id="sts-loader" class="sts-loading-area"><div class="sts-spinner"></div><h3>Scout está trabalhando...</h3><p>Cruzando dados de Cliques e Visualizações.</p></div>
                         <div id="scout-results" style="margin-top:30px;"></div>
                     </div>
 
-                    <!-- Tutorial Master GSC -->
                     <div id="tab-settings" class="sts-tab-content">
-                        <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
+                        <!-- Tutorial GSC mantido v1.6.6 -->
+                        <div style="display:grid; grid-template-columns: 1fr 350px; gap:40px;">
                             <div>
                                 <h3 style="margin-top:0;">🏁 Guia Completo de Configuração Google</h3>
-                                <p style="color:#64748b; margin-bottom:25px;">Siga cada passo abaixo para conectar seu site ao Google Search Console.</p>
-
-                                <div class="sts-tuto-step">
-                                    <div class="sts-tuto-num">1</div>
-                                    <h4>Criar Projeto no Google Cloud</h4>
-                                    <p>Acesse o <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>. No topo da tela, clique em <b>"Selecionar um projeto"</b> (ou no nome do projeto atual) e depois em <b>"Novo Projeto"</b>. Nomeie como <strong>"Scout SEO"</strong>.</p>
-                                </div>
-
-                                <div class="sts-tuto-step">
-                                    <div class="sts-tuto-num">2</div>
-                                    <h4>Ativar a API do Search Console</h4>
-                                    <p>No menu lateral esquerdo (três tracinhos), vá em <b>"APIs e Serviços" > "Biblioteca"</b>. Na barra de busca, digite <strong>"Google Search Console API"</strong>. Clique no resultado e depois em <b>"Ativar"</b>.</p>
-                                </div>
-
-                                <div class="sts-tuto-step">
-                                    <div class="sts-tuto-num">3</div>
-                                    <h4>Configurar Tela de Consentimento</h4>
-                                    <p>Vá em <b>"APIs e Serviços" > "Tela de permissão OAuth"</b>. Selecione <b>"Externo"</b> e clique em Criar. Preencha apenas o nome do app ("Scout") e seu e-mail de suporte. Clique em "Salvar e Continuar" até o final.</p>
-                                </div>
-
-                                <div class="sts-tuto-step" style="border-color:#fbbf24; background:#fffdf5;">
-                                    <div class="sts-tuto-num" style="background:#fbbf24;">4</div>
-                                    <h4>Criar Credenciais (O Passo Chave)</h4>
-                                    <p>Vá em <b>"APIs e Serviços" > "Credenciais"</b>. Clique em <b>"+ Criar Credenciais" > "ID do cliente OAuth"</b>. Tipo de aplicativo: <b>"Aplicativo da Web"</b>.</p>
-                                    <div class="sts-copy-block">
-                                        <div>
-                                            <strong style="color:#111;">URI de Redirecionamento Autorizado:</strong><br>
-                                            <span style="font-size:11px;">Copie este link e cole no campo do Google:</span><br>
-                                            <code id="sts-uri"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="sts-tuto-step"><div class="sts-tuto-num">1</div><h4>Projeto no Cloud</h4><p>Crie um projeto no <a href="https://console.cloud.google.com/" target="_blank">Google Cloud</a> chamado "Scout SEO".</p></div>
+                                <div class="sts-tuto-step"><div class="sts-tuto-num">2</div><h4>Ativar API</h4><p>Pesquise e ative a <b>"Google Search Console API"</b>.</p></div>
+                                <div class="sts-tuto-step" style="border-color:#fbbf24; background:#fffdf5;"><div class="sts-tuto-num" style="background:#fbbf24;">3</div><h4>Redirect URI</h4><code><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code></div>
                             </div>
-
-                            <div style="background:#f8fafc; padding:30px; border-radius:15px; border:1px solid #e2e8f0; height:fit-content; position:sticky; top:20px;">
-                                <h4 style="margin:0 0 20px 0; border-bottom:1px solid #e2e8f0; padding-bottom:15px;">🔧 Cole os códigos aqui:</h4>
-                                <label style="display:block; margin-bottom:15px;">
-                                    <strong>Google Client ID:</strong><br>
-                                    <input type="text" id="gsc-client-id" style="width:100%; padding:10px;" placeholder="Ex: 12345-abcde.apps.googleusercontent.com" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>">
-                                </label>
-                                <label style="display:block; margin-bottom:20px;">
-                                    <strong>Google Client Secret:</strong><br>
-                                    <input type="password" id="gsc-client-secret" style="width:100%; padding:10px;" placeholder="Sua chave secreta do Google" value="********">
-                                </label>
-                                <button class="button button-primary button-large" style="width:100%; height:50px; font-weight:bold;" id="save-gsc-btn">🚀 SALVAR E CONECTAR GOOGLE</button>
-                                <div style="margin-top:20px; font-size:11px; color:#64748b; line-height:1.4;">
-                                    ℹ️ <b>Dica:</b> Você encontrará estes códigos (Cliente ID e Segredo) na tela final do passo 4 no site do Google.
-                                </div>
+                            <div style="background:#f8fafc; padding:25px; border-radius:12px; border:1px solid #e2e8f0; height:fit-content;">
+                                <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
+                                <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
+                                <button class="button button-primary" style="width:100%" id="save-gsc-btn">🚀 Salvar e Autorizar</button>
                             </div>
                         </div>
                     </div>
@@ -187,12 +140,12 @@ class Dashboard {
 
             <div id="sts-help-modal" class="sts-audit-modal">
                 <div class="sts-modal-content">
-                    <h3 style="border-bottom:2px solid #d63638; padding-bottom:10px;">🛡️ Ajuda do Scout</h3>
-                    <p>Aqui você resolve conflitos onde duas URLs competem pelo mesmo termo.</p>
+                    <h3>🛡️ Ajuda do Scout</h3>
+                    <p>Compare Cliques e Visualizações para decidir qual URL manter.</p>
                     <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="width:100%">Fechar</button>
                 </div>
             </div>
-            
+
             <script>
             jQuery(document).ready(function($) {
                 $('.sts-tab-link').on('click', function() {
@@ -218,15 +171,21 @@ class Dashboard {
                                         <div class='sts-conflict-grid'>
                                             <div class='sts-url-unit' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
                                                 <span class='sts-type-tag sts-type-${item.type1}'>${item.type1}</span><br><strong>/${item.post1}/</strong>
-                                                <div class='sts-gsc-mini-badge'>📊 ${item.gsc1.clicks} clicks</div>
+                                                <div class='sts-gsc-stats'>
+                                                    <div class='sts-mini-stat'>🖱️ ${item.gsc1.clicks} clicks</div>
+                                                    <div class='sts-mini-stat'>👁️ ${item.gsc1.impressions} views</div>
+                                                </div>
                                             </div>
                                             <div class='sts-vs-icon'>VS</div>
                                             <div class='sts-url-unit' style='${item.gsc2.clicks < item.gsc1.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
                                                 <span class='sts-type-tag sts-type-${item.type2}'>${item.type2}</span><br><strong>/${item.post2}/</strong>
-                                                <div class='sts-gsc-mini-badge'>📊 ${item.gsc2.clicks} clicks</div>
+                                                <div class='sts-gsc-stats'>
+                                                    <div class='sts-mini-stat'>🖱️ ${item.gsc2.clicks} clicks</div>
+                                                    <div class='sts-mini-stat'>👁️ ${item.gsc2.impressions} views</div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <button class='button resolve-btn' data-index='${index}' style='margin-left:20px;'>Resolve</button>
+                                        <button class='button resolve-btn' data-index='${index}' style='margin-left:15px;'>Resolve</button>
                                     </div>`;
                                 });
                                 results.html(h).fadeIn(); window.audit_items=res.data.conflicts;
