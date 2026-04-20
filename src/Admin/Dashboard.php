@@ -99,7 +99,7 @@ class Dashboard {
                         <select class="sts-lang-switch" id="sts-lang-selector">
                             <option value="pt_BR" <?php selected($current_lang,'pt_BR');?>>🇧🇷 Português</option>
                             <option value="en_US" <?php selected($current_lang,'en_US');?>>🇺🇸 English</option>
-                            <option value="es_ES" <?php selected($current_lang,'es_ES');?>>🇪🇸 Español (EP)</option>
+                            <option value="es_ES" <?php selected($current_lang,'es_ES');?>>🇪🇸 Español</option>
                         </select>
                         <div class="sts-help-trigger" onclick="jQuery('#sts-help-modal').fadeIn()">?</div>
                     </div>
