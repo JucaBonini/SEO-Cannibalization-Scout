@@ -79,7 +79,9 @@ class Dashboard {
             .sts-step-num { position:absolute; left:-12px; top:15px; background:#d63638; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; }
             @media (max-width: 782px) { .sts-scout-header { flex-direction:column; align-items:flex-start; gap:20px; } .sts-conflict-grid { grid-template-columns:1fr; } }
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
-            .sts-modal-content { background:#fff; margin:10% auto; padding:30px; border-radius:12px; width:550px; }
+            .sts-modal-content { background:#fff; margin:5% auto; padding:35px; border-radius:12px; width:650px; max-width:90%; position:relative; }
+            .sts-help-section { margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px; }
+            .sts-help-section h4 { color:#d63638; margin:0 0 10px 0; }
         ");
     }
 
@@ -96,12 +98,6 @@ class Dashboard {
                             <p>Ultimate SEO Authority Auditor</p>
                         </div>
                         <div class="sts-help-trigger" onclick="jQuery('#sts-help-modal').fadeIn()">?</div>
-                    </div>
-                    <div class="sts-header-actions">
-                        <select class="sts-lang-selector" id="sts-scout-lang-switch">
-                            <option value="pt_BR" <?php selected($current_lang,'pt_BR');?>>🇧🇷 PT</option>
-                            <option value="en_US" <?php selected($current_lang,'en_US');?>>🇺🇸 EN</option>
-                        </select>
                     </div>
                 </div>
                 
@@ -129,7 +125,6 @@ class Dashboard {
                         <div id="scout-results" style="margin-top:30px;"></div>
                     </div>
 
-                    <!-- Tab GSC Master Guide -->
                     <div id="tab-settings" class="sts-tab-content">
                         <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
@@ -151,19 +146,43 @@ class Dashboard {
                     <div id="tab-support" class="sts-tab-content">
                         <div style="text-align:center; padding:40px;">
                              <h2 style="margin-top:0;">Support the Project</h2>
-                             <p style="color:#666; margin-bottom:40px;">Se você gosta da ferramenta, considere apoiar o desenvolvimento com uma doação.</p>
                              <div style="display:flex; justify-content:center; gap:15px;">
                                  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=2.00&currency_code=USD" target="_blank" class="button button-hero" style="min-width:120px;">$2.00</a>
                                  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=5.00&currency_code=USD" target="_blank" class="button button-hero button-primary" style="min-width:120px;">$5.00</a>
                                  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=10.00&currency_code=USD" target="_blank" class="button button-hero" style="min-width:120px; background:#111 !important; color:#fff !important;">$10.00</a>
                              </div>
-                             <p style="margin-top:40px;"><a href="https://wordpress.org/support/plugin/seo-cannibalization-scout/reviews/" target="_blank">Ou deixe uma avaliação 5 estrelas ★★★★★</a></p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="sts-help-modal" class="sts-audit-modal"><div class="sts-modal-content"><h3>Ajuda Cirúrgica</h3><p>Compare os cliques do Google para decidir qual URL manter.</p><button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="width:100%">Entendi!</button></div></div>
+            <!-- Modal Ajuda Completo -->
+            <div id="sts-help-modal" class="sts-audit-modal">
+                <div class="sts-modal-content">
+                    <h3 style="margin-top:0; border-bottom:2px solid #d63638; padding-bottom:10px;">🛡️ Central de Ajuda do Scout</h3>
+                    
+                    <div class="sts-help-section">
+                        <h4>O que é Canibalização de SEO?</h4>
+                        <p style="font-size:13px; line-height:1.5;">Ocorre quando você tem duas ou mais URLs competindo pela mesma palavra-chave. Isso confunde o Google e divide sua autoridade, fazendo você perder posições.</p>
+                    </div>
+
+                    <div class="sts-help-section">
+                        <h4>Como usar os dados do Google (GSC)?</h4>
+                        <p style="font-size:13px; line-height:1.5;">O plugin compara os cliques reais. A URL com **MAIS cliques** (o vencedor) deve ser mantida. A URL com menos cliques deve ser "resolvida".</p>
+                    </div>
+
+                    <div class="sts-help-section">
+                        <h4>Principais Soluções:</h4>
+                        <p style="font-size:13px; line-height:1.5;">
+                            <b>1. Canonical (Recomendado):</b> Avisa ao Google que a URL 'A' é a principal, mas mantém a 'B' ativa para os usuários.<br><br>
+                            <b>2. Redirecionamento 301:</b> Move permanentemente o tráfego de 'B' para 'A'. Use quando o conteúdo for idêntico.
+                        </p>
+                    </div>
+
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary button-large" style="width:100%">Entendi, vamos auditar!</button>
+                </div>
+            </div>
+
             <div id="sts-resolve-modal" class="sts-audit-modal">
                 <div class="sts-modal-content"><h3>Resolver Conflito</h3><p>Deseja aplicar a Tag Canonical para a URL com mais cliques?</p>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;"><button class="button" onclick="jQuery('#sts-resolve-modal').fadeOut()">Cancelar</button><button class="button button-primary" id="final-resolve-btn">Confirmar</button></div></div>
