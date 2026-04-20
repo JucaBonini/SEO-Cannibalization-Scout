@@ -24,77 +24,73 @@ class Dashboard {
     public function enqueue_assets($hook) {
         if ('toplevel_page_seo-cannibalization-scout' !== $hook) return;
         wp_add_inline_style('wp-admin', "
-            .sts-scout-container { max-width: 98%; margin: 20px auto; }
-            .sts-scout-card { border-radius: 8px; position:relative; background:#fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccd0d4; overflow:hidden; }
-            .sts-scout-header { background: #d63638; color: #fff; padding: 40px; display:flex; justify-content:space-between; align-items:center; }
+            .sts-scout-card { max-width: 1300px; margin-top: 20px; border-radius: 8px; position:relative; background:#fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccd0d4; overflow:hidden; }
+            .sts-scout-header { background: #d63638; color: #fff; padding: 40px; display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; }
             .sts-scout-header h2 { color: #fff !important; margin: 0 !important; font-size: 28px; line-height:1.2; }
             .sts-scout-header p { color: rgba(255,255,255,0.8); margin: 5px 0 0 0; }
-            .sts-scout-content { padding: 20px; }
             
-            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; border:1px solid rgba(255,255,255,0.3); transition:0.3s; }
+            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:20px; border:1px solid rgba(255,255,255,0.3); transition:0.3s; }
             .sts-help-trigger:hover { background:#fff; color:#d63638; }
-            
-            .sts-side-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-            .sts-side-table th { text-align: left; background: #f6f7f7; padding: 10px; border: 1px solid #dcdcde; }
-            .sts-side-table td { padding: 10px; border: 1px solid #dcdcde; vertical-align: top; }
-            .sts-side-tag { display: block; font-weight: 700; margin-bottom: 3px; color: #2271b1; }
 
+            .sts-scout-content { padding: 0 40px 40px 40px; }
             .sts-conflict-item { background: #fff; border: 1px solid #ccd0d4; padding: 20px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #d63638; }
             .sts-conflict-item.warning { border-left-color: #ffb900; }
             .sts-slug-tag { font-family: monospace; background: #f0f0f1; padding: 2px 6px; border-radius: 3px; font-size: 11px; color: #50575e; }
             .sts-stat-box { background: #f6f7f7; padding: 15px; border-radius: 4px; flex: 1; text-align: center; border: 1px solid #dcdcde; }
             .sts-stat-num { display: block; font-size: 28px; font-weight: 700; color: #d63638; }
+            
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
-            .sts-modal-content { background:#fff; margin:10% auto; padding:30px; border-radius:12px; width:500px; box-shadow:0 20px 50px rgba(0,0,0,0.2); }
+            .sts-modal-content { background:#fff; margin:10% auto; padding:30px; border-radius:12px; width:550px; box-shadow:0 20px 50px rgba(0,0,0,0.2); }
             .sts-modal-actions { display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:25px; }
             .sts-modal-btn { padding:15px; border:1px solid #eee; border-radius:10px; cursor:pointer; text-align:center; transition:0.3s; }
             .sts-modal-btn:hover { background:#f6f7f7; border-color:#2271b1; }
             .sts-modal-btn h4 { margin:0 0 5px 0; color:#2271b1; }
             .sts-modal-btn p { margin:0; font-size:12px; color:#666; }
             .sts-pt-label { background:#fff; padding:5px 12px; border:1px solid #ccd0d4; border-radius:4px; font-size:13px; cursor:pointer; display:inline-block; margin:0 5px 5px 0; }
+            
+            .sts-side-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+            .sts-side-table th { text-align: left; background: #f6f7f7; padding: 10px; border: 1px solid #dcdcde; }
+            .sts-side-table td { padding: 10px; border: 1px solid #dcdcde; vertical-align: top; }
         ");
     }
 
     public function render_page() {
         ?>
-        <div class="wrap">
-            <div class="sts-scout-container">
-                <div class="sts-scout-card card">
-                    <div class="sts-scout-header">
-                        <div>
-                            <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
-                            <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
-                        </div>
-                        <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Comparative Summary', 'seo-cannibalization-scout'); ?>">?</div>
+        <div class="wrap" style="max-width: 1300px; margin: 20px auto;">
+            <div class="sts-scout-card card">
+                <div class="sts-scout-header">
+                    <div>
+                        <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
+                        <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
                     </div>
+                    <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Help Summary', 'seo-cannibalization-scout'); ?>">?</div>
+                </div>
+                
+                <div class="sts-scout-content">
+                    <p><strong><?php _e('Select content types to audit:', 'seo-cannibalization-scout'); ?></strong></p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+                        <?php
+                        $post_types = get_post_types(['public' => true], 'objects');
+                        foreach ($post_types as $pt) :
+                            if (in_array($pt->name, ['attachment', 'revision', 'nav_menu_item'])) continue;
+                            $checked = ($pt->name === 'post' || $pt->name === 'page') ? 'checked' : '';
+                        ?>
+                            <label class="sts-pt-label">
+                                <input type="checkbox" name="post_types[]" value="<?php echo esc_attr($pt->name); ?>" <?php echo $checked; ?>> 
+                                <?php echo esc_html($pt->label); ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                    <button type="button" class="button button-primary button-large" id="run-scout-btn">
+                        <?php _e('Start Scan', 'seo-cannibalization-scout'); ?>
+                    </button>
+                    <span class="spinner" id="scout-spinner"></span>
                     
-                    <div class="sts-scout-content">
-                        <p><strong><?php _e('Select content types to audit:', 'seo-cannibalization-scout'); ?></strong></p>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
-                            <?php
-                            $post_types = get_post_types(['public' => true], 'objects');
-                            foreach ($post_types as $pt) :
-                                if (in_array($pt->name, ['attachment', 'revision', 'nav_menu_item'])) continue;
-                                $checked = ($pt->name === 'post' || $pt->name === 'page') ? 'checked' : '';
-                            ?>
-                                <label class="sts-pt-label">
-                                    <input type="checkbox" name="post_types[]" value="<?php echo esc_attr($pt->name); ?>" <?php echo $checked; ?>> 
-                                    <?php echo esc_html($pt->label); ?>
-                                </label>
-                            <?php endforeach; ?>
-                        </div>
-                        
-                        <button type="button" class="button button-primary button-large" id="run-scout-btn">
-                            <?php _e('Start Scan', 'seo-cannibalization-scout'); ?>
-                        </button>
-                        <span class="spinner" id="scout-spinner"></span>
-                        
-                        <div id="scout-results" style="margin-top:30px;"></div>
-                    </div>
+                    <div id="scout-results" style="margin-top:30px;"></div>
                 </div>
             </div>
 
-            <!-- Modal de Ajuda -->
+            <!-- Modal Ajuda -->
             <div id="sts-help-modal" class="sts-audit-modal">
                 <div class="sts-modal-content" style="width:600px;">
                     <h3><?php _e('Resumo Comparativo', 'seo-cannibalization-scout'); ?></h3>
@@ -124,7 +120,7 @@ class Dashboard {
                 </div>
             </div>
 
-            <!-- Modal -->
+            <!-- Modal Resolve -->
             <div id="sts-resolve-modal" class="sts-audit-modal">
                 <div class="sts-modal-content">
                     <h3><?php _e('How to resolve?', 'seo-cannibalization-scout'); ?></h3>
@@ -246,13 +242,6 @@ class Dashboard {
                 wp_update_post(['ID' => $post_from, 'post_status' => 'draft']);
             }
         }
-        wp_send_json_success();
-    }
-
-    public function ajax_save_lang() {
-        if (!current_user_can('manage_options')) wp_send_json_error();
-        $lang = sanitize_text_field($_POST['lang']);
-        update_user_meta(get_current_user_id(), 'cannibal_audit_lang', $lang);
         wp_send_json_success();
     }
 
