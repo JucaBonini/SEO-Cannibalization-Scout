@@ -4,7 +4,7 @@ Tags: seo, cannibalization, url-conflicts, search-engine-optimization, content-a
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,10 @@ Yes, you can select any public post type (Posts, Pages, Recipes, etc.) before st
 1. The main dashboard showing conflict statistics and detected issues.
 
 == Changelog ==
+
+= 1.1.3 =
+* Improved UI responsiveness and removed excessive layout gaps.
+* Refined grid proportions to 1fr / 380px.
 
 = 1.1.0 =
 * Major re-branding to SEO Cannibalization Scout.
