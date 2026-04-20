@@ -7,6 +7,18 @@ class Dashboard {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_sts_cannibal_run_audit', [$this, 'ajax_run_audit']);
         add_action('wp_ajax_sts_cannibal_resolve_issue', [$this, 'ajax_resolve_issue']);
+        add_action('wp_ajax_sts_cannibal_save_lang', [$this, 'ajax_save_lang']);
+        
+        // Filtro para forçar o idioma apenas neste plugin
+        add_filter('plugin_locale', [$this, 'force_plugin_locale'], 10, 2);
+    }
+
+    public function force_plugin_locale($locale, $domain) {
+        if ($domain === 'seo-cannibalization-scout') {
+            $user_lang = get_user_meta(get_current_user_id(), 'sts_scout_lang', true);
+            if ($user_lang) return $user_lang;
+        }
+        return $locale;
     }
 
     public function add_menu_page() {
@@ -29,6 +41,10 @@ class Dashboard {
             .sts-scout-header h2 { color: #fff !important; margin: 0 !important; font-size: 28px; line-height:1.2; }
             .sts-scout-header p { color: rgba(255,255,255,0.8); margin: 5px 0 0 0; }
             
+            .sts-header-actions { display:flex; align-items:center; gap:15px; }
+            .sts-lang-selector { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:12px; }
+            .sts-lang-selector option { color:#333; }
+
             .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:20px; border:1px solid rgba(255,255,255,0.3); transition:0.3s; }
             .sts-help-trigger:hover { background:#fff; color:#d63638; }
 
@@ -55,6 +71,8 @@ class Dashboard {
     }
 
     public function render_page() {
+        $current_lang = get_user_meta(get_current_user_id(), 'sts_scout_lang', true);
+        if (!$current_lang) $current_lang = get_locale();
         ?>
         <div class="wrap" style="max-width: 1300px; margin: 20px auto;">
             <div class="sts-scout-card card">
@@ -63,7 +81,14 @@ class Dashboard {
                         <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
                         <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
                     </div>
-                    <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Help Summary', 'seo-cannibalization-scout'); ?>">?</div>
+                    <div class="sts-header-actions">
+                        <select class="sts-lang-selector" id="sts-scout-lang-switch">
+                            <option value="pt_BR" <?php selected($current_lang, 'pt_BR'); ?>>🇧🇷 PT</option>
+                            <option value="en_US" <?php selected($current_lang, 'en_US'); ?>>🇺🇸 EN</option>
+                            <option value="es_ES" <?php selected($current_lang, 'es_ES'); ?>>🇪🇸 ES</option>
+                        </select>
+                        <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Help Summary', 'seo-cannibalization-scout'); ?>">?</div>
+                    </div>
                 </div>
                 
                 <div class="sts-scout-content">
@@ -151,6 +176,14 @@ class Dashboard {
                 };
                 const nonce_audit = '<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>';
 
+                // Troca de Idioma
+                $('#sts-scout-lang-switch').on('change', function() {
+                    const newLang = $(this).val();
+                    $.post(ajaxurl, { action: 'sts_cannibal_save_lang', lang: newLang }, function() {
+                        location.reload();
+                    });
+                });
+
                 $('#open-help-modal').on('click', function() {
                     $('#sts-help-modal').fadeIn();
                 });
@@ -223,6 +256,13 @@ class Dashboard {
             </script>
         </div>
         <?php
+    }
+
+    public function ajax_save_lang() {
+        if (!current_user_can('manage_options')) wp_send_json_error();
+        $lang = sanitize_text_field($_POST['lang']);
+        update_user_meta(get_current_user_id(), 'sts_scout_lang', $lang);
+        wp_send_json_success();
     }
 
     public function ajax_resolve_issue() {
