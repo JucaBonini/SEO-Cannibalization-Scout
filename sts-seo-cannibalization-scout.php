@@ -3,7 +3,7 @@
  * Plugin Name: SEO Cannibalization Scout
  * Plugin URI: https://descomplicandoreceitas.com.br
  * Description: Auditoria avançada de canibalização de conteúdo e conflitos de URLs para WordPress. Detecte e organize sua autoridade de pesquisa.
- * Version: 1.6.6
+ * Version: 1.6.7
  * Author: Juca Souza Bonini
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
