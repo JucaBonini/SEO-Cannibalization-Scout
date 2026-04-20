@@ -35,7 +35,14 @@ class Dashboard {
         $perf = wp_remote_post("https://www.googleapis.com/webmasters/v3/sites/{$site}/searchAnalytics/query", ['headers'=>['Authorization'=>'Bearer '.$token,'Content-Type'=>'application/json'],'body'=>json_encode(['startDate'=>date('Y-m-d',strtotime('-30 days')),'endDate'=>date('Y-m-d'),'dimensions'=>['page'],'rowLimit'=>5000])]);
         if (is_wp_error($perf)) return [];
         $rows = json_decode(wp_remote_retrieve_body($perf),true)['rows'] ?? [];
-        $map = []; foreach($rows as $r) { $map[$r['keys'][0]] = ['clicks'=>$r['clicks'],'impressions'=>$r['impressions']]; }
+        $map = []; foreach($rows as $r) { 
+            $map[$r['keys'][0]] = [
+                'clicks' => $r['clicks'],
+                'impressions' => $r['impressions'],
+                'ctr' => round($r['ctr'] * 100, 2),
+                'position' => round($r['position'], 1)
+            ]; 
+        }
         set_transient('sts_scout_gsc_data', $map, DAY_IN_SECONDS); return $map;
     }
 
@@ -54,11 +61,9 @@ class Dashboard {
     public function enqueue_assets($hook) {
         if('toplevel_page_seo-cannibalization-scout'!==$hook) return;
         wp_add_inline_style('wp-admin', "
-            .sts-scout-card { max-width:1300px; margin:20px auto; border-radius:12px; background:#fff; box-shadow:0 10px 25px rgba(0,0,0,0.05); border:1px solid #e2e8f0; overflow:hidden; }
+            .sts-scout-card { max-width:1300px; margin:20px auto; border-radius:12px; background:#fff; border:1px solid #e2e8f0; overflow:hidden; }
             .sts-scout-header { background:#d63638; color:#fff; padding:35px 45px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color:#fff!important; margin:0!important; font-size:28px; }
-            .sts-header-actions { display:flex; align-items:center; gap:15px; }
-            .sts-lang-switch { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer; }
             .sts-help-btn { background:#fff; color:#d63638; width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; margin-left:15px; vertical-align:middle; transition:0.3s; }
             .sts-help-btn:hover { background:rgba(255,255,255,0.8); }
             .sts-scout-content { padding:30px; }
@@ -71,11 +76,11 @@ class Dashboard {
             .sts-conflict-card { background:#fff; border:1px solid #e2e8f0; padding:25px; margin-bottom:20px; border-radius:12px; border-left:6px solid #d63638; display:flex; justify-content:space-between; align-items:center; }
             .sts-duel-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; width:100%; }
             .sts-url-box { background:#f8fafc; padding:20px; border-radius:10px; border:1px solid #edf2f7; }
+            .sts-metrics-row { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+            .sts-metric-tag { background:#fff; border:1px solid #e2e8f0; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; color:#4a5568; display:flex; align-items:center; gap:5px; }
+            .sts-vs-circle { background:#d63638; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; }
             .sts-stat-card { background:#f8fafc; padding:20px; border-radius:10px; flex:1; text-align:center; border:1px solid #e2e8f0; }
             .sts-stat-val { display:block; font-size:28px; font-weight:800; color:#d63638; }
-            .sts-loading-overlay { text-align:center; padding:60px; display:none; }
-            .sts-loader-spinner { border:4px solid #f3f3f3; border-top:4px solid #d63638; border-radius:50%; width:40px; height:40px; animation:spin 1s linear infinite; margin:0 auto 20px; }
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             .sts-help-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
             .sts-modal-content { background:#fff; margin:10% auto; padding:35px; border-radius:12px; width:600px; max-width:90%; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.2); }
         ");
@@ -91,6 +96,7 @@ class Dashboard {
             'analyzed_label' => __('Items','seo-cannibalization-scout'),
             'conflicts_label' => __('Conflicts Found','seo-cannibalization-scout'),
             'clicks_label' => __('clicks','seo-cannibalization-scout'),
+            'views_label' => __('views','seo-cannibalization-scout'),
             'impress_label' => __('impressions','seo-cannibalization-scout'),
             'resolve_btn' => __('Resolve','seo-cannibalization-scout'),
             'start_action' => __('Iniciar Varredura','seo-cannibalization-scout'),
@@ -134,9 +140,9 @@ class Dashboard {
                         </div>
                         <button class="button button-primary button-hero" id="run-audit-action" style="height:45px; padding:0 30px;"><?php _e('Iniciar Varredura','seo-cannibalization-scout');?></button>
                         
-                        <div id="sts-audit-loader" class="sts-loading-overlay">
+                        <div id="sts-audit-loader" style="text-align:center; padding:60px; display:none;">
                             <div class="sts-loader-spinner"></div>
-                            <h3 id="loader-text"><?php echo $i18n['analyzing'];?></h3>
+                            <h3><?php echo $i18n['analyzing'];?></h3>
                         </div>
 
                         <div id="sts-audit-results" style="margin-top:40px;"></div>
@@ -146,37 +152,20 @@ class Dashboard {
                         <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
                                 <h3 style="margin-top:0;"><?php _e('Como conectar ao Google Search Console','seo-cannibalization-scout');?></h3>
-                                <p><?php _e('Siga os passos para liberar os dados de cliques e impressões.','seo-cannibalization-scout');?></p>
                                 <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:15px;">
                                     <h4 style="margin-top:0;">1. Google Cloud Console</h4>
                                     <p><?php _e('Crie um projeto "Scout SEO".','seo-cannibalization-scout');?></p>
                                 </div>
-                                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:15px;">
-                                    <h4 style="margin-top:0;">2. Ative as APIs</h4>
-                                    <p><?php _e('Ative a "Google Search Console API".','seo-cannibalization-scout');?></p>
-                                </div>
                                 <div style="background:#fffaf0; border:1px solid #fbd38d; border-radius:10px; padding:20px;">
                                     <h4 style="margin-top:0; color:#975a16;">3. OAuth Redirect URI</h4>
-                                    <code style="word-break:break-all; display:block; padding:10px; background:#fff; border:1px solid #e2e8f0;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
+                                    <code><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
                                 </div>
                             </div>
                             <div style="background:#f8fafc; padding:35px; border-radius:15px; border:1px solid #e2e8f0;">
                                 <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
                                 <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
-                                <button class="button button-primary button-large" style="width:100%; height:45px;" id="save-gsc-config"><?php _e('Save','seo-cannibalization-scout');?></button>
+                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-config"><?php _e('Save','seo-cannibalization-scout');?></button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="panel-support" class="sts-tab-panel">
-                        <div style="text-align:center; padding:60px 0;">
-                             <h2 style="font-size:28px;"><?php _e('Support & Donations','seo-cannibalization-scout');?></h2>
-                             <div style="display:flex; justify-content:center; gap:20px; margin:30px 0;">
-                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&amount=2.00" target="_blank" class="button button-hero">$2.00</a>
-                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&amount=5.00" target="_blank" class="button button-hero button-primary">$5.00</a>
-                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&amount=10.00" target="_blank" class="button button-hero" style="background:#111!important; color:#fff!important;">$10.00</a>
-                             </div>
-                             <a href="https://wordpress.org/support/plugin/seo-cannibalization-scout/reviews/" target="_blank" style="font-weight:700; color:#d63638;">★★★★★ <?php _e('Rate 5 Stars on WordPress.org','seo-cannibalization-scout');?></a>
                         </div>
                     </div>
                 </div>
@@ -186,11 +175,7 @@ class Dashboard {
                 <div class="sts-modal-content">
                     <h3 style="border-bottom:3px solid #d63638; padding-bottom:15px; margin-top:0;">🛡️ <?php _e('Como deseja resolver?','seo-cannibalization-scout');?></h3>
                     <p><?php _e('Escolha uma ação para consolidar a autoridade.','seo-cannibalization-scout');?></p>
-                    <p style="background:#f8fafc; padding:15px; border-radius:8px; font-size:13px; line-height:1.6;">
-                        <strong><?php _e('Autoridade (Canonical)','seo-cannibalization-scout');?>:</strong> <?php _e('Mantenha ambas URLs online, mas aponte a força do SEO para a principal.','seo-cannibalization-scout');?><br><br>
-                        <strong><?php _e('Redirecionamento (301)','seo-cannibalization-scout');?>:</strong> <?php _e('Remova o acesso a esta URL e envie os usuários para a principal.','seo-cannibalization-scout');?>
-                    </p>
-                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary button-large" style="width:100%; height:45px;"><?php _e('Entendi!','seo-cannibalization-scout');?></button>
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary button-large" style="width:100%;"><?php _e('Entendi!','seo-cannibalization-scout');?></button>
                 </div>
             </div>
 
@@ -225,7 +210,8 @@ class Dashboard {
                                                 <span class='sts-badge' style='background:#e2e8f0; color:#4a5568;'>${item.type1}</span><br><strong>/${item.post1}/</strong>
                                                 <div class='sts-metrics-row'>
                                                     <div class='sts-metric-tag'>🖱️ ${item.gsc1.clicks} ${sts_i18n.clicks_label}</div>
-                                                    <div class='sts-metric-tag'>👁️ ${item.gsc1.impressions} ${sts_i18n.impress_label}</div>
+                                                    <div class='sts-metric-tag'>👁️ ${item.gsc1.impressions} ${sts_i18n.views_label}</div>
+                                                    <div class='sts-metric-tag'>📊 ${item.gsc1.impressions} ${sts_i18n.impress_label}</div>
                                                 </div>
                                             </div>
                                             <div class='sts-vs-circle'>VS</div>
@@ -233,7 +219,8 @@ class Dashboard {
                                                 <span class='sts-badge' style='background:#e2e8f0; color:#4a5568;'>${item.type2}</span><br><strong>/${item.post2}/</strong>
                                                 <div class='sts-metrics-row'>
                                                     <div class='sts-metric-tag'>🖱️ ${item.gsc2.clicks} ${sts_i18n.clicks_label}</div>
-                                                    <div class='sts-metric-tag'>👁️ ${item.gsc2.impressions} ${sts_i18n.impress_label}</div>
+                                                    <div class='sts-metric-tag'>👁️ ${item.gsc2.impressions} ${sts_i18n.views_label}</div>
+                                                    <div class='sts-metric-tag'>📊 ${item.gsc2.impressions} ${sts_i18n.impress_label}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -274,7 +261,7 @@ class Dashboard {
              if(get_post_meta($pid,'_sts_seo_canonical',true)) continue;
              $slug = get_post_field('post_name',$pid); $url=get_permalink($pid);
              $norm = preg_replace($pat,'',$slug); $norm = preg_replace('/(s|es)$/','',$norm);
-             $map[$norm][] = ['id'=>$pid,'slug'=>$slug,'type'=>get_post_type($pid),'url'=>$url,'gsc'=>$gsc[$url]??['clicks'=>0,'impressions'=>0]];
+             $map[$norm][] = ['id'=>$pid,'slug'=>$slug,'type'=>get_post_type($pid),'url'=>$url,'gsc'=>$gsc[$url]??['clicks'=>0,'impressions'=>0,'ctr'=>0,'position'=>0]];
         }
         foreach($map as $k=>$items) {
              if(count($items)>1) {
