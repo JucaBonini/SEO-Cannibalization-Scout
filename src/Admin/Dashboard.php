@@ -395,26 +395,95 @@ class Dashboard {
 
     public function ajax_run_audit() {
         check_ajax_referer('cannibal_audit_nonce');
+        if (!current_user_can('manage_options')) wp_send_json_error();
+
         $types = isset($_POST['types']) ? array_map('sanitize_text_field', $_POST['types']) : ['post'];
-        $posts = get_posts(['post_type' => $types, 'posts_per_page' => -1, 'post_status' => 'publish', 'fields' => 'ids']);
-        $conflicts = []; $slugs_data = [];
-        $suffixes = ['receita', 'facil', 'passo-a-passo', 'caseiro', 'fofinho', 'simples', 'rapido'];
+        
+        $posts = get_posts([
+            'post_type' => $types,
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'fields' => 'ids'
+        ]);
+
+        $conflicts = [];
+        $map = []; // Agrupador por Slug Normalizado
+        
+        $suffixes = ['receita', 'facil', 'passo-a-passo', 'caseiro', 'fofinho', 'simples', 'rapido', 'melhor', 'tradicional', 'cremoso'];
         $suffix_pattern = '/-(' . implode('|', $suffixes) . ')$/';
+
+        // Passo 1: Normalização e Mapeamento (O(N))
         foreach ($posts as $post_id) {
+            if (get_post_meta($post_id, '_sts_seo_canonical', true)) continue;
+
             $slug = get_post_field('post_name', $post_id);
+            
+            // Normalização pesada feita apenas 1 vez por post
             $norm = preg_replace($suffix_pattern, '', $slug);
             $norm = preg_replace('/(s|es)$/', '', $norm);
-            $slugs_data[$post_id] = [ 'id' => $post_id, 'slug' => $slug, 'type' => get_post_type($post_id), 'url' => get_permalink($post_id), 'norm' => $norm ];
+
+            $data = [
+                'id' => $post_id,
+                'slug' => $slug,
+                'type' => get_post_type($post_id),
+                'url' => get_permalink($post_id),
+                'norm' => $norm
+            ];
+
+            $map[$norm][] = $data;
         }
-        $ids = array_keys($slugs_data);
-        for ($i = 0; $i < count($ids); $i++) {
-            for ($j = $i + 1; $j < count($ids); $j++) {
-                $a = $slugs_data[$ids[$i]]; $b = $slugs_data[$ids[$j]];
-                if ($a['norm'] === $b['norm'] || (strlen($a['norm']) > 5 && strpos($b['norm'], $a['norm']) !== false)) {
-                    $conflicts[] = [ 'keyword' => $a['norm'], 'post1' => $a['slug'], 'post2' => $b['slug'], 'type1' => $a['type'], 'id1' => $a['id'], 'url2' => $b['url'], 'status' => $a['norm']===$b['norm'] ? 'CRÍTICO' : 'ATENÇÃO' ];
+
+        // Passo 2: Detecção Velocidade Máxima de Conflitos CRÍTICOS
+        foreach ($map as $keyword => $items) {
+            if (count($items) > 1) {
+                // Existe mais de um post com o mesmo "DNA" (norm)
+                // Vamos comparar o primeiro com os outros
+                $master = $items[0];
+                for ($i = 1; $i < count($items); $i++) {
+                    $slave = $items[$i];
+                    $conflicts[] = [
+                        'keyword' => $keyword,
+                        'post1' => $slave['slug'],
+                        'post2' => $master['slug'],
+                        'type1' => $slave['type'],
+                        'type2' => $master['type'],
+                        'id1' => $slave['id'],
+                        'url2' => $master['url'],
+                        'status' => 'CRÍTICO'
+                    ];
                 }
             }
         }
+
+        // Passo 3: Detecção de Conflitos de ATENÇÃO (Parciais)
+        // Só fazemos isso entre as chaves do mapa para ser mais rápido
+        $keys = array_keys($map);
+        $total_keys = count($keys);
+        for ($i = 0; $i < $total_keys; $i++) {
+            for ($j = $i + 1; $j < $total_keys; $j++) {
+                $key_a = $keys[$i];
+                $key_b = $keys[$j];
+
+                // Se uma palavra-chave longa contém a outra curta
+                if (strlen($key_a) > 5 && strlen($key_b) > 5) {
+                    if (strpos($key_a, $key_b) !== false || strpos($key_b, $key_a) !== false) {
+                        $a = $map[$key_a][0];
+                        $b = $map[$key_b][0];
+                        $conflicts[] = [
+                            'keyword' => $key_a . ' vs ' . $key_b,
+                            'post1' => $a['slug'],
+                            'post2' => $b['slug'],
+                            'type1' => $a['type'],
+                            'type2' => $b['type'],
+                            'id1' => $a['id'],
+                            'url2' => $b['url'],
+                            'status' => 'ATENÇÃO'
+                        ];
+                    }
+                }
+            }
+        }
+
         wp_send_json_success(['total_posts' => count($posts), 'conflicts' => $conflicts]);
     }
 }
