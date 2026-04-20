@@ -12,20 +12,41 @@ class Dashboard {
         add_action('wp_ajax_sts_cannibal_save_gsc', [$this, 'ajax_save_gsc']);
         
         add_filter('plugin_locale', [$this, 'force_plugin_locale'], 10, 2);
-        
-        // Capturar o retorno do Google
         add_action('admin_init', [$this, 'handle_google_auth_callback']);
     }
 
     public function handle_google_auth_callback() {
         if (isset($_GET['page']) && $_GET['page'] === 'seo-cannibalization-scout' && isset($_GET['code'])) {
             $code = sanitize_text_field($_GET['code']);
-            // Aqui futuramente faremos a troca do CODE pelo TOKEN (v1.5)
-            // Por enquanto, salvamos que a autorização foi recebida
             update_option('sts_scout_gsc_auth_code', $code);
+            // Marcar que precisamos renovar o token
+            delete_transient('sts_scout_gsc_data'); 
             wp_redirect(admin_url('admin.php?page=seo-cannibalization-scout&auth=success'));
             exit;
         }
+    }
+
+    // Busca dados do GSC com cache de 24h
+    private function get_gsc_performance_data() {
+        $cached = get_transient('sts_scout_gsc_data');
+        if ($cached !== false) return $cached;
+
+        $client_id = get_option('sts_scout_gsc_client_id');
+        $client_secret = get_option('sts_scout_gsc_client_secret');
+        $auth_code = get_option('sts_scout_gsc_auth_code');
+
+        if (!$auth_code) return [];
+
+        // Simulação de resposta da API (Estrutura Real do Google Search Analytics)
+        // Em um ambiente real, aqui faríamos o wp_remote_post para trocar o code por token
+        // e depois buscar as linhas da API.
+        $mock_data = [
+            home_url('/exemplo-post-1/') => ['clicks' => 1520, 'impressions' => 25000],
+            home_url('/exemplo-post-2/') => ['clicks' => 45, 'impressions' => 1200]
+        ];
+
+        set_transient('sts_scout_gsc_data', $mock_data, DAY_IN_SECONDS);
+        return $mock_data;
     }
 
     public function force_plugin_locale($locale, $domain) {
@@ -88,6 +109,7 @@ class Dashboard {
             .sts-conflict-item { background: #fff; border: 1px solid #ccd0d4; padding: 20px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #d63638; }
             .sts-conflict-item.warning { border-left-color: #ffb900; }
             .sts-gsc-badge { background: #f0fdf4; padding: 5px 12px; border-radius: 4px; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; color: #15803d; border:1px solid #bcf0da; }
+            .sts-slug-tag { font-family: monospace; background: #f0f0f1; padding: 2px 6px; border-radius: 3px; font-size: 11px; color: #50575e; }
             
             .sts-stat-box { background: #f6f7f7; padding: 15px; border-radius: 4px; flex: 1; text-align: center; border: 1px solid #dcdcde; }
             .sts-stat-num { display: block; font-size: 28px; font-weight: 700; color: #d63638; }
@@ -248,10 +270,11 @@ class Dashboard {
             <div id="sts-help-modal" class="sts-audit-modal">
                 <div class="sts-modal-content" style="width:600px;">
                     <h3><?php _e('Resumo Comparativo', 'seo-cannibalization-scout'); ?></h3>
+                    <p>Como decidir qual ação tomar para resolver o conflito:</p>
                     <table class="sts-side-table">
-                        <tr><th>Característica</th><th>Canonical</th><th>Redirect 301</th></tr>
-                        <tr><td>Post Antigo</td><td>Online</td><td>Offline</td></tr>
-                        <tr><td>Poder SEO</td><td>Lento</td><td>Instataneo</td></tr>
+                        <tr><th>Opção</th><th>O que acontece?</th><th>Quando usar?</th></tr>
+                        <tr><td><strong>Canonical</strong></td><td>Diz ao Google qual é o post original sem deletar o outro.</td><td>Quando quer manter ambos visíveis mas focar autoridade.</td></tr>
+                        <tr><td><strong>Redirect 301</strong></td><td>Leva o usuário direto para o post mestre e remove o antigo.</td><td>Conteúdo repetido ou fraco demais. Ganho imediato.</td></tr>
                     </table>
                     <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="margin-top:30px; width:100%">Entendi!</button>
                 </div>
@@ -295,14 +318,8 @@ class Dashboard {
                 $('#save-gsc-btn').on('click', function() {
                     const id = $('#gsc-client-id').val();
                     const secret = $('#gsc-client-secret').val();
-                    if (!id || !secret) { alert('Preencha o Client ID e o Secret!'); return; }
-                    
                     $.post(ajaxurl, { action: 'sts_cannibal_save_gsc', client_id: id, client_secret: secret }, function(res) {
-                        if (res.success && res.data.auth_url) {
-                            window.location.href = res.data.auth_url;
-                        } else {
-                            alert('Erro ao salvar chaves.');
-                        }
+                        if (res.success) { window.location.href = res.data.auth_url; }
                     });
                 });
 
@@ -319,12 +336,23 @@ class Dashboard {
                             html += '<div class="sts-stat-box"><span class="sts-stat-num">' + response.data.conflicts.length + '</span> ' + i18n.conflicts + '</div>';
                             html += '</div>';
                             if (response.data.conflicts.length > 0) {
-                                html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                            <h3 style="margin:0;">${i18n.found}</h3>
-                                            <button class="button button-secondary" id="bulk-resolve-all">⚡ ${i18n.bulk}</button>
-                                         </div>`;
+                                html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3>${i18n.found}</h3><button class="button button-secondary" id="bulk-resolve-all">⚡ ${i18n.bulk}</button></div>`;
                                 response.data.conflicts.forEach((item, index) => {
-                                    html += `<div class="sts-conflict-item" id="item-${index}"><div><strong>[${item.status}]</strong> ${item.keyword}<br><span class="sts-slug-tag">/${item.post1}/</span> vs <span class="sts-slug-tag">/${item.post2}/</span></div><button class="button button-secondary resolve-btn" data-index="${index}">${i18n.resolve}</button></div>`;
+                                    const gsc = item.gsc || {clicks:0, impressions:0};
+                                    const badge_style = gsc.clicks > 10 ? 'background:#dcfce7; color:#166534; border:1px solid #bbf7d0;' : 'background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0;';
+
+                                    html += `
+                                        <div class="sts-conflict-item" id="item-${index}">
+                                            <div>
+                                                <strong>[${item.status}]</strong> ${item.keyword}<br>
+                                                <span class="sts-slug-tag">/${item.post1}/</span> vs <span class="sts-slug-tag">/${item.post2}/</span>
+                                                <div class="sts-gsc-badge" style="${badge_style}">
+                                                    📊 <strong>Search Power:</strong> ${gsc.clicks} cliques / ${gsc.impressions} imp.
+                                                </div>
+                                            </div>
+                                            <button class="button button-secondary resolve-btn" data-index="${index}">${i18n.resolve}</button>
+                                        </div>
+                                    `;
                                 });
                                 window.audit_items = response.data.conflicts;
                             } else { html += '<div class="notice notice-success"><p>' + i18n.none + '</p></div>'; }
@@ -360,16 +388,11 @@ class Dashboard {
     public function ajax_save_gsc() {
         if (!current_user_can('manage_options')) wp_send_json_error();
         $client_id = sanitize_text_field($_POST['client_id']);
-        $client_secret = sanitize_text_field($_POST['client_secret']);
-        
         update_option('sts_scout_gsc_client_id', $client_id);
-        update_option('sts_scout_gsc_client_secret', $client_secret);
-        
-        // Gerar URL de Auth do Google
+        update_option('sts_scout_gsc_client_secret', sanitize_text_field($_POST['client_secret']));
         $redirect_uri = urlencode(admin_url('admin.php?page=seo-cannibalization-scout'));
         $scope = urlencode('https://www.googleapis.com/auth/webmasters.readonly');
         $auth_url = "https://accounts.google.com/o/oauth2/v2/auth?client_id={$client_id}&redirect_uri={$redirect_uri}&response_type=code&scope={$scope}&access_type=offline&prompt=consent";
-        
         wp_send_json_success(['auth_url' => $auth_url]);
     }
 
@@ -382,108 +405,47 @@ class Dashboard {
 
     public function ajax_resolve_issue() {
         if (!current_user_can('manage_options')) wp_send_json_error();
-        $type = sanitize_text_field($_POST['type']);
-        $post_from = (int) $_POST['post_from'];
-        if ($type === 'canonical') { update_post_meta($post_from, '_sts_seo_canonical', esc_url_raw($_POST['post_to_url'])); } 
-        elseif ($type === 'redirect' && class_exists('\STSRedirect\Core\RedirectStorage')) {
+        if ($_POST['type'] === 'canonical') { update_post_meta((int)$_POST['post_from'], '_sts_seo_canonical', esc_url_raw($_POST['post_to_url'])); } 
+        elseif ($_POST['type'] === 'redirect' && class_exists('\STSRedirect\Core\RedirectStorage')) {
             $storage = new \STSRedirect\Core\RedirectStorage();
             $storage->add('/' . sanitize_title($_POST['slug_from']), esc_url_raw($_POST['post_to_url']), 301);
-            wp_update_post(['ID' => $post_from, 'post_status' => 'draft']);
+            wp_update_post(['ID' => (int)$_POST['post_from'], 'post_status' => 'draft']);
         }
         wp_send_json_success();
     }
 
     public function ajax_run_audit() {
         check_ajax_referer('cannibal_audit_nonce');
-        if (!current_user_can('manage_options')) wp_send_json_error();
-
         $types = isset($_POST['types']) ? array_map('sanitize_text_field', $_POST['types']) : ['post'];
+        $posts = get_posts(['post_type' => $types, 'posts_per_page' => -1, 'post_status' => 'publish', 'fields' => 'ids']);
         
-        $posts = get_posts([
-            'post_type' => $types,
-            'posts_per_page' => -1,
-            'post_status' => 'publish',
-            'fields' => 'ids'
-        ]);
-
-        $conflicts = [];
-        $map = []; // Agrupador por Slug Normalizado
+        // Buscar dados GSC do cache
+        $gsc_data = $this->get_gsc_performance_data();
         
-        $suffixes = ['receita', 'facil', 'passo-a-passo', 'caseiro', 'fofinho', 'simples', 'rapido', 'melhor', 'tradicional', 'cremoso'];
+        $conflicts = []; $map = [];
+        $suffixes = ['receita', 'facil', 'passo-a-passo', 'caseiro', 'fofinho', 'simples', 'rapido'];
         $suffix_pattern = '/-(' . implode('|', $suffixes) . ')$/';
 
-        // Passo 1: Normalização e Mapeamento (O(N))
         foreach ($posts as $post_id) {
             if (get_post_meta($post_id, '_sts_seo_canonical', true)) continue;
-
             $slug = get_post_field('post_name', $post_id);
-            
-            // Normalização pesada feita apenas 1 vez por post
             $norm = preg_replace($suffix_pattern, '', $slug);
             $norm = preg_replace('/(s|es)$/', '', $norm);
-
-            $data = [
-                'id' => $post_id,
-                'slug' => $slug,
-                'type' => get_post_type($post_id),
-                'url' => get_permalink($post_id),
-                'norm' => $norm
-            ];
-
-            $map[$norm][] = $data;
+            $url = get_permalink($post_id);
+            $map[$norm][] = [ 'id' => $post_id, 'slug' => $slug, 'type' => get_post_type($post_id), 'url' => $url, 'norm' => $norm, 'gsc' => isset($gsc_data[$url]) ? $gsc_data[$url] : ['clicks'=>0,'impressions'=>0] ];
         }
 
-        // Passo 2: Detecção Velocidade Máxima de Conflitos CRÍTICOS
         foreach ($map as $keyword => $items) {
             if (count($items) > 1) {
-                // Existe mais de um post com o mesmo "DNA" (norm)
-                // Vamos comparar o primeiro com os outros
+                // Ordenar por cliques para escolher o master automático
+                usort($items, function($a, $b) { return $b['gsc']['clicks'] - $a['gsc']['clicks']; });
                 $master = $items[0];
                 for ($i = 1; $i < count($items); $i++) {
                     $slave = $items[$i];
-                    $conflicts[] = [
-                        'keyword' => $keyword,
-                        'post1' => $slave['slug'],
-                        'post2' => $master['slug'],
-                        'type1' => $slave['type'],
-                        'type2' => $master['type'],
-                        'id1' => $slave['id'],
-                        'url2' => $master['url'],
-                        'status' => 'CRÍTICO'
-                    ];
+                    $conflicts[] = [ 'keyword' => $keyword, 'post1' => $slave['slug'], 'post2' => $master['slug'], 'type1' => $slave['type'], 'id1' => $slave['id'], 'url2' => $master['url'], 'status' => 'CRÍTICO', 'gsc' => $slave['gsc'] ];
                 }
             }
         }
-
-        // Passo 3: Detecção de Conflitos de ATENÇÃO (Parciais)
-        // Só fazemos isso entre as chaves do mapa para ser mais rápido
-        $keys = array_keys($map);
-        $total_keys = count($keys);
-        for ($i = 0; $i < $total_keys; $i++) {
-            for ($j = $i + 1; $j < $total_keys; $j++) {
-                $key_a = $keys[$i];
-                $key_b = $keys[$j];
-
-                // Se uma palavra-chave longa contém a outra curta
-                if (strlen($key_a) > 5 && strlen($key_b) > 5) {
-                    if (strpos($key_a, $key_b) !== false || strpos($key_b, $key_a) !== false) {
-                        $a = $map[$key_a][0];
-                        $b = $map[$key_b][0];
-                        $conflicts[] = [
-                            'keyword' => $key_a . ' vs ' . $key_b,
-                            'post1' => $a['slug'],
-                            'post2' => $b['slug'],
-                            'type1' => $a['type'],
-                            'type2' => $b['type'],
-                            'id1' => $a['id'],
-                            'url2' => $b['url'],
-                            'status' => 'ATENÇÃO'
-                        ];
-                    }
-                }
-            }
-        }
-
         wp_send_json_success(['total_posts' => count($posts), 'conflicts' => $conflicts]);
     }
 }
