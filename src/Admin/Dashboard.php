@@ -178,6 +178,19 @@ class Dashboard {
                             <a href="https://wordpress.org/support/plugin/seo-cannibalization-scout/reviews/#new-post" target="_blank" class="button button-primary button-large">
                                 <?php _e('Leave a Review', 'seo-cannibalization-scout'); ?>
                             </a>
+
+                            <div style="margin-top:60px; border-top:1px solid #eee; padding-top:40px;">
+                                <div style="font-size:40px; margin-bottom:10px;">☕</div>
+                                <h3><?php _e('Support the Project', 'seo-cannibalization-scout'); ?></h3>
+                                <p style="color:#666;"><?php _e('Maintain this free tool and buy the developer a coffee!', 'seo-cannibalization-scout'); ?></p>
+                                
+                                <div style="display:flex; justify-content:center; gap:10px; margin-top:20px; flex-wrap:wrap;">
+                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout+Project&amount=2.00&currency_code=USD" target="_blank" class="button" style="border-color:#d63638; color:#d63638;">$2.00</a>
+                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout+Project&amount=5.00&currency_code=USD" target="_blank" class="button" style="border-color:#d63638; color:#d63638;">$5.00</a>
+                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout+Project&amount=10.00&currency_code=USD" target="_blank" class="button" style="background:#d63638 !important; color:#fff !important; border:none;">$10.00</a>
+                                </div>
+                                <p style="font-size:11px; color:#999; margin-top:15px;">Secure payment via PayPal</p>
+                            </div>
                         </div>
                     </div>
                 </div>
