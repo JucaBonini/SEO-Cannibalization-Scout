@@ -56,7 +56,8 @@ class Dashboard {
     }
 
     public function render_page() {
-                <div class="wrap">
+        ?>
+        <div class="wrap">
             <div class="sts-scout-container">
                 <div class="sts-scout-card card">
                     <div class="sts-scout-header">
@@ -92,7 +93,6 @@ class Dashboard {
                     </div>
                 </div>
             </div>
-v>
 
             <!-- Modal de Ajuda -->
             <div id="sts-help-modal" class="sts-audit-modal">
