@@ -58,7 +58,9 @@ class Dashboard {
             .sts-scout-card { max-width:1300px; margin:20px auto; border-radius:8px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid #ccd0d4; overflow:hidden; }
             .sts-scout-header { background:#d63638; color:#fff; padding:30px 40px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color:#fff!important; margin:0!important; font-size:26px; }
-            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; border:1px solid rgba(255,255,255,0.3); }
+            .sts-scout-header p { color:rgba(255,255,255,0.8); margin:5px 0 0 0; font-size:13px; }
+            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; border:1px solid rgba(255,255,255,0.3); transition:0.3s; }
+            .sts-help-trigger:hover { background:#fff; color:#d63638; }
             .sts-scout-content { padding:30px; }
             .sts-scout-tabs { display:flex; gap:5px; border-bottom:1px solid #ddd; margin-bottom:20px; }
             .sts-tab-link { padding:10px 20px; cursor:pointer; font-weight:600; color:#666; border:1px solid transparent; border-bottom:none; border-radius:5px 5px 0 0; margin-bottom:-1px; }
@@ -67,7 +69,7 @@ class Dashboard {
             .sts-tab-content.active { display:block; }
             .sts-conflict-item { background:#fff; border:1px solid #ccd0d4; padding:25px; margin-bottom:15px; border-radius:8px; border-left:6px solid #d63638; display:flex; justify-content:space-between; align-items:center; }
             .sts-conflict-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:15px; align-items:center; width:100%; }
-            .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; position:relative; }
+            .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; }
             .sts-type-tag { font-size:9px; text-transform:uppercase; font-weight:bold; padding:2px 6px; border-radius:4px; margin-bottom:10px; display:inline-block; }
             .sts-type-post { background:#e0f2fe; color:#0369a1; }
             .sts-type-story { background:#fef3c7; color:#92400e; }
@@ -79,8 +81,8 @@ class Dashboard {
             .sts-loading-area { text-align:center; padding:50px; display:none; }
             .sts-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #d63638; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .sts-tuto-step { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:25px; margin-bottom:20px; position:relative; }
-            .sts-tuto-num { background:#d63638; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:15px; }
+            .sts-tuto-step { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:15px; position:relative; }
+            .sts-tuto-num { background:#d63638; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:10px; }
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
             .sts-modal-content { background:#fff; margin:10% auto; padding:35px; border-radius:12px; width:650px; max-width:90%; position:relative; }
         ");
@@ -102,7 +104,7 @@ class Dashboard {
                     <div class="sts-scout-tabs">
                         <div class="sts-tab-link active" data-tab="audit">Audit Dashboard</div>
                         <div class="sts-tab-link" data-tab="settings">GSC Integration <?php echo $is_authed?'✅':'';?></div>
-                        <div class="sts-tab-link" data-tab="support">Support</div>
+                        <div class="sts-tab-link" data-tab="support">Review & Support</div>
                     </div>
 
                     <div id="tab-audit" class="sts-tab-content active">
@@ -119,30 +121,45 @@ class Dashboard {
                         <div id="scout-results" style="margin-top:30px;"></div>
                     </div>
 
+                    <!-- GSC Tutorial Restored -->
                     <div id="tab-settings" class="sts-tab-content">
-                        <!-- Tutorial GSC mantido v1.6.6 -->
-                        <div style="display:grid; grid-template-columns: 1fr 350px; gap:40px;">
+                        <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
-                                <h3 style="margin-top:0;">🏁 Guia Completo de Configuração Google</h3>
-                                <div class="sts-tuto-step"><div class="sts-tuto-num">1</div><h4>Projeto no Cloud</h4><p>Crie um projeto no <a href="https://console.cloud.google.com/" target="_blank">Google Cloud</a> chamado "Scout SEO".</p></div>
-                                <div class="sts-tuto-step"><div class="sts-tuto-num">2</div><h4>Ativar API</h4><p>Pesquise e ative a <b>"Google Search Console API"</b>.</p></div>
-                                <div class="sts-tuto-step" style="border-color:#fbbf24; background:#fffdf5;"><div class="sts-tuto-num" style="background:#fbbf24;">3</div><h4>Redirect URI</h4><code><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code></div>
+                                <h3 style="margin-top:0;">🏁 Guia Passo-a-Passo</h3>
+                                <div class="sts-tuto-step"><div class="sts-tuto-num">1</div><h4>Google Cloud</h4><p>Crie o projeto no <a href="https://console.cloud.google.com/" target="_blank">Cloud Console</a>.</p></div>
+                                <div class="sts-tuto-step"><div class="sts-tuto-num">2</div><h4>Ative a API</h4><p>Ative a <b>"Google Search Console API"</b>.</p></div>
+                                <div class="sts-tuto-step" style="border-color:#fbbf24; background:#fffdf5;"><div class="sts-tuto-num" style="background:#fbbf24;">3</div><h4>URI Autorizada</h4><code><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code></div>
                             </div>
-                            <div style="background:#f8fafc; padding:25px; border-radius:12px; border:1px solid #e2e8f0; height:fit-content;">
+                            <div style="background:#f8fafc; padding:30px; border-radius:15px; border:1px solid #e2e8f0;">
                                 <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
                                 <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
-                                <button class="button button-primary" style="width:100%" id="save-gsc-btn">🚀 Salvar e Autorizar</button>
+                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-btn">🚀 Salvar e Autorizar</button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- SUPPORT TAB FULLY RESTORED -->
+                    <div id="tab-support" class="sts-tab-content">
+                        <div style="text-align:center; padding:40px;">
+                             <h2 style="margin-top:0;">Support & Donations</h2>
+                             <p style="color:#666; margin-bottom:40px;">Buy the developer a coffee!</p>
+                             <div style="display:flex; justify-content:center; gap:15px; margin-bottom:40px;">
+                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=2.00&currency_code=USD" target="_blank" class="button button-hero" style="min-width:120px;">$2.00</a>
+                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=5.00&currency_code=USD" target="_blank" class="button button-hero button-primary" style="min-width:120px;">$5.00</a>
+                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=10.00&currency_code=USD" target="_blank" class="button button-hero" style="min-width:120px; background:#111 !important; color:#fff !important;">$10.00</a>
+                             </div>
+                             <p><a href="https://wordpress.org/support/plugin/seo-cannibalization-scout/reviews/" target="_blank" style="font-weight:600; color:#d63638;">★★★★★ Deixe uma avaliação no WordPress.org</a></p>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- HELP MODAL RESTORED -->
             <div id="sts-help-modal" class="sts-audit-modal">
                 <div class="sts-modal-content">
-                    <h3>🛡️ Ajuda do Scout</h3>
-                    <p>Compare Cliques e Visualizações para decidir qual URL manter.</p>
-                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="width:100%">Fechar</button>
+                    <h3 style="border-bottom:2px solid #d63638; padding-bottom:10px;">🛡️ Ajuda do Scout</h3>
+                    <p><b>Cliques vs Views:</b> Use a URL com mais cliques como autoridade Master. Resolva os conflitos aplicando a tag Canonical.</p>
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="width:100%; height:45px;">Fechar</button>
                 </div>
             </div>
 
@@ -158,16 +175,16 @@ class Dashboard {
                     });
                 });
                 $('#run-scout-btn').on('click', function() {
-                    const btn = $(this); const loader = $('#sts-loader'); const results = $('#scout-results');
-                    const types = $('input[name="post_types[]"]:checked').map(function(){ return $(this).val(); }).get();
-                    btn.prop('disabled', true).text('⏳ Scaneando...'); results.fadeOut(); loader.fadeIn();
-                    $.post(ajaxurl, {action:'sts_cannibal_run_audit', types:types, _ajax_nonce:'<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>'}, function(res) {
-                        btn.prop('disabled', false).html('🚀 Start Surgical Scan');
-                        loader.fadeOut(function() {
-                            if(res.success) {
-                                let h = `<div style='display:flex;gap:20px;margin-bottom:30px;'><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.total_posts}</span> Items</div><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.conflicts.length}</span> Conflicts</div></div>`;
-                                res.data.conflicts.forEach((item, index) => {
-                                    h += `<div class='sts-conflict-item' id='item-${index}'>
+                    const btn=$(this); const loader=$('#sts-loader'); const results=$('#scout-results');
+                    const types=$('input[name="post_types[]"]:checked').map(function(){return $(this).val();}).get();
+                    btn.prop('disabled',true).text('⏳ Scaneando...'); results.fadeOut(); loader.fadeIn();
+                    $.post(ajaxurl,{action:'sts_cannibal_run_audit',types:types,_ajax_nonce:'<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>'},function(res){
+                        btn.prop('disabled',false).html('🚀 Start Surgical Scan');
+                        loader.fadeOut(function(){
+                            if(res.success){
+                                let h=`<div style='display:flex;gap:20px;margin-bottom:30px;'><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.total_posts}</span> Items</div><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.conflicts.length}</span> Conflicts</div></div>`;
+                                res.data.conflicts.forEach((item,index)=>{
+                                    h+=`<div class='sts-conflict-item' id='item-${index}'>
                                         <div class='sts-conflict-grid'>
                                             <div class='sts-url-unit' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
                                                 <span class='sts-type-tag sts-type-${item.type1}'>${item.type1}</span><br><strong>/${item.post1}/</strong>
