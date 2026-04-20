@@ -77,9 +77,12 @@ class Dashboard {
         <div class="wrap" style="max-width: 1300px; margin: 20px auto;">
             <div class="sts-scout-card card">
                 <div class="sts-scout-header">
-                    <div>
-                        <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
-                        <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <div>
+                            <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
+                            <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
+                        </div>
+                        <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Help Summary', 'seo-cannibalization-scout'); ?>">?</div>
                     </div>
                     <div class="sts-header-actions">
                         <select class="sts-lang-selector" id="sts-scout-lang-switch">
@@ -87,7 +90,6 @@ class Dashboard {
                             <option value="en_US" <?php selected($current_lang, 'en_US'); ?>>🇺🇸 EN</option>
                             <option value="es_ES" <?php selected($current_lang, 'es_ES'); ?>>🇪🇸 ES</option>
                         </select>
-                        <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Help Summary', 'seo-cannibalization-scout'); ?>">?</div>
                     </div>
                 </div>
                 
