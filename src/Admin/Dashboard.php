@@ -82,7 +82,7 @@ class Dashboard {
             .sts-stat-card { background:#f8fafc; padding:20px; border-radius:10px; flex:1; text-align:center; border:1px solid #e2e8f0; }
             .sts-stat-val { display:block; font-size:28px; font-weight:800; color:#d63638; }
             .sts-help-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
-            .sts-modal-content { background:#fff; margin:10% auto; padding:35px; border-radius:12px; width:600px; max-width:90%; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.2); }
+            .sts-modal-content { background:#fff; margin:5% auto; padding:35px; border-radius:12px; width:700px; max-width:95%; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.2); }
         ");
     }
 
@@ -152,20 +152,36 @@ class Dashboard {
                         <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
                                 <h3 style="margin-top:0;"><?php _e('Como conectar ao Google Search Console','seo-cannibalization-scout');?></h3>
+                                <p><?php _e('Siga os passos para liberar os dados de cliques e impressões.','seo-cannibalization-scout');?></p>
                                 <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:15px;">
                                     <h4 style="margin-top:0;">1. Google Cloud Console</h4>
                                     <p><?php _e('Crie um projeto "Scout SEO".','seo-cannibalization-scout');?></p>
                                 </div>
+                                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:15px;">
+                                    <h4 style="margin-top:0;">2. Ative as APIs</h4>
+                                    <p><?php _e('Ative a "Google Search Console API".','seo-cannibalization-scout');?></p>
+                                </div>
                                 <div style="background:#fffaf0; border:1px solid #fbd38d; border-radius:10px; padding:20px;">
                                     <h4 style="margin-top:0; color:#975a16;">3. OAuth Redirect URI</h4>
-                                    <code><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
+                                    <code style="word-break:break-all; display:block; padding:10px; background:#fff; border:1px solid #e2e8f0;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code>
                                 </div>
                             </div>
                             <div style="background:#f8fafc; padding:35px; border-radius:15px; border:1px solid #e2e8f0;">
                                 <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
                                 <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
-                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-config"><?php _e('Save','seo-cannibalization-scout');?></button>
+                                <button class="button button-primary button-large" style="width:100%; height:45px;" id="save-gsc-config"><?php _e('Save','seo-cannibalization-scout');?></button>
                             </div>
+                        </div>
+                    </div>
+
+                    <div id="panel-support" class="sts-tab-panel">
+                        <div style="text-align:center; padding:60px 0;">
+                             <h2 style="font-size:28px;"><?php _e('Support & Donations','seo-cannibalization-scout');?></h2>
+                             <div style="display:flex; justify-content:center; gap:20px; margin:30px 0;">
+                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&amount=2.00" target="_blank" class="button button-hero">$2.00</a>
+                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&amount=5.00" target="_blank" class="button button-hero button-primary">$5.00</a>
+                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&amount=10.00" target="_blank" class="button button-hero" style="background:#111!important; color:#fff!important;">$10.00</a>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -173,9 +189,17 @@ class Dashboard {
 
             <div id="sts-help-modal" class="sts-help-modal">
                 <div class="sts-modal-content">
-                    <h3 style="border-bottom:3px solid #d63638; padding-bottom:15px; margin-top:0;">🛡️ <?php _e('Como deseja resolver?','seo-cannibalization-scout');?></h3>
-                    <p><?php _e('Escolha uma ação para consolidar a autoridade.','seo-cannibalization-scout');?></p>
-                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary button-large" style="width:100%;"><?php _e('Entendi!','seo-cannibalization-scout');?></button>
+                    <h3 style="border-bottom:3px solid #d63638; padding-bottom:15px; margin-top:0;">🛡️ <?php _e('Centro de Estratégia Scout','seo-cannibalization-scout');?></h3>
+                    <p style="font-size:15px; line-height:1.6; color:#4a5568;">
+                        <?php _e('Compare Cliques e Visualizações para decidir qual URL manter.','seo-cannibalization-scout');?><br>
+                        <strong><?php _e('Dica de Mestre','seo-cannibalization-scout');?>:</strong> <?php _e('Se uma URL tem muito mais cliques, ela deve ser a sua URL Master.','seo-cannibalization-scout');?>
+                    </p>
+                    <div style="background:#f8fafc; padding:20px; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0;">
+                        <h4 style="margin-top:0; color:#d63638;"><?php _e('Como deseja resolver?','seo-cannibalization-scout');?></h4>
+                        <p><strong><?php _e('Autoridade (Canonical)','seo-cannibalization-scout');?>:</strong> <?php _e('Mantenha ambas URLs online, mas aponte a força do SEO para a principal. Use quando o conteúdo for útil mas repetido.','seo-cannibalization-scout');?></p>
+                        <p><strong><?php _e('Redirecionamento (301)','seo-cannibalization-scout');?>:</strong> <?php _e('Envio automático do usuário para a Master. Use para exterminar páginas de baixa qualidade e consolidar autoridade.','seo-cannibalization-scout');?></p>
+                    </div>
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary button-large" style="width:100%; height:45px; font-weight:bold;"><?php _e('Entendi, vamos decolar!','seo-cannibalization-scout');?></button>
                 </div>
             </div>
 
