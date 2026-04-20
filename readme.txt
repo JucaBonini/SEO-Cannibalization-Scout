@@ -4,7 +4,7 @@ Tags: seo, cannibalization, url-conflicts, search-engine-optimization, content-a
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ This plugin scans your published content, analyzes slugs and keywords, and ident
 *   **Quick Resolution:** Fix issues directly from the dashboard using Canonical tags or 301 Redirects.
 *   **Clean Interface:** Modern, localized dashboard integrated into your WordPress admin.
 *   **Performance Focused:** Lightweight code that only runs when you start a scan.
+*   **Multi-language:** Support for English, Portuguese, and Spanish.
 
 == Installation ==
 
@@ -42,6 +43,11 @@ Yes, you can select any public post type (Posts, Pages, Recipes, etc.) before st
 1. The main dashboard showing conflict statistics and detected issues.
 
 == Changelog ==
+
+= 1.2.0 =
+* Added full multi-language support (English, Portuguese, Spanish).
+* Implemented help modal for comparative summary.
+* Expanded dashboard width to 1300px for better desktop experience.
 
 = 1.1.3 =
 * Improved UI responsiveness and removed excessive layout gaps.

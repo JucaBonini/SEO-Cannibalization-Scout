@@ -1,0 +1,98 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SEO Cannibalization Scout 1.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-19 23:00+0000\n"
+"PO-Revision-Date: 2026-04-19 23:00+0000\n"
+"Last-Translator: Juca Souza Bonini\n"
+"Language-Team: \n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Domain: seo-cannibalization-scout\n"
+
+msgid "SEO Cannibalization Scout"
+msgstr "SEO Cannibalization Scout (Auditoría)"
+
+msgid "Professional URL Conflict and Content Cannibalization Detector."
+msgstr "Detector Profesional de Conflictos de URL y Canibalización de Contenido."
+
+msgid "Select content types to audit:"
+msgstr "Seleccione los tipos de contenido para auditar:"
+
+msgid "Start Scan"
+msgstr "Iniciar Escaneo"
+
+msgid "Items"
+msgstr "Artículos"
+
+msgid "Conflicts"
+msgstr "Conflictos"
+
+msgid "Conflicts Found"
+msgstr "Conflictos Encontrados"
+
+msgid "No conflicts found!"
+msgstr "¡No se encontraron conflictos!"
+
+msgid "Resolve"
+msgstr "Resolver"
+
+msgid "How to resolve?"
+msgstr "¿Cómo resolverlo?"
+
+msgid "Choose an action to consolidate authority."
+msgstr "Elija una acción para consolidar la autoridad."
+
+msgid "Authority (Canonical)"
+msgstr "Autoridad (Canonical)"
+
+msgid "Keep both URLs online, but point SEO power to master."
+msgstr "Mantenga ambas URL en línea, pero apunte la fuerza del SEO a la principal."
+
+msgid "Redirect (301)"
+msgstr "Redirección (301)"
+
+msgid "Remove access to this URL and send users to master."
+msgstr "Elimine el acceso a esta URL y envíe a los usuarios a la principal."
+
+msgid "Resumo Comparativo"
+msgstr "Resumen Comparativo"
+
+msgid "Característica"
+msgstr "Característica"
+
+msgid "Post Antigo"
+msgstr "Entrada Antigua"
+
+msgid "Poder de SEO"
+msgstr "Poder de SEO"
+
+msgid "Qual escolher?"
+msgstr "¿Cuál elegir?"
+
+msgid "Fica online (Visível)"
+msgstr "Permanece en línea (Visible)"
+
+msgid "Fica Offline (Draft)"
+msgstr "Pasa a Desconectado (Borrador)"
+
+msgid "Flui lentamente"
+msgstr "Fluye lentamente"
+
+msgid "Transfere instantaneamente"
+msgstr "Se transfiere al instante"
+
+msgid "Limpar briga sem deletar nada."
+msgstr "Resolver conflicto sin borrar nada."
+
+msgid "Exterminar repetidos e ser o #1."
+msgstr "Eliminar duplicados y ser el #1."
+
+msgid "Entendi!"
+msgstr "¡Entendido!"
+
+msgid "Cancel"
+msgstr "Cancelar"

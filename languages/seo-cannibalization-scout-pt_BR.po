@@ -1,0 +1,98 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SEO Cannibalization Scout 1.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-19 23:00+0000\n"
+"PO-Revision-Date: 2026-04-19 23:00+0000\n"
+"Last-Translator: Juca Souza Bonini\n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Domain: seo-cannibalization-scout\n"
+
+msgid "SEO Cannibalization Scout"
+msgstr "SEO Cannibalization Scout (Auditoria)"
+
+msgid "Professional URL Conflict and Content Cannibalization Detector."
+msgstr "Detector Profissional de Conflitos de URL e Canibalização de Conteúdo."
+
+msgid "Select content types to audit:"
+msgstr "Selecione os tipos de conteúdo para auditar:"
+
+msgid "Start Scan"
+msgstr "Iniciar Varredura"
+
+msgid "Items"
+msgstr "Itens"
+
+msgid "Conflicts"
+msgstr "Conflitos"
+
+msgid "Conflicts Found"
+msgstr "Conflitos Encontrados"
+
+msgid "No conflicts found!"
+msgstr "Nenhum conflito encontrado!"
+
+msgid "Resolve"
+msgstr "Resolver"
+
+msgid "How to resolve?"
+msgstr "Como deseja resolver?"
+
+msgid "Choose an action to consolidate authority."
+msgstr "Escolha uma ação para consolidar a autoridade."
+
+msgid "Authority (Canonical)"
+msgstr "Autoridade (Canonical)"
+
+msgid "Keep both URLs online, but point SEO power to master."
+msgstr "Mantenha ambas URLs online, mas aponte a força do SEO para a principal."
+
+msgid "Redirect (301)"
+msgstr "Redirecionamento (301)"
+
+msgid "Remove access to this URL and send users to master."
+msgstr "Remova o acesso a esta URL e envie os usuários para a principal."
+
+msgid "Resumo Comparativo"
+msgstr "Resumo Comparativo"
+
+msgid "Característica"
+msgstr "Característica"
+
+msgid "Post Antigo"
+msgstr "Post Antigo"
+
+msgid "Poder de SEO"
+msgstr "Poder de SEO"
+
+msgid "Qual escolher?"
+msgstr "Qual escolher?"
+
+msgid "Fica online (Visível)"
+msgstr "Fica online (Visível)"
+
+msgid "Fica Offline (Draft)"
+msgstr "Fica Offline (Rascunho)"
+
+msgid "Flui lentamente"
+msgstr "Flui lentamente"
+
+msgid "Transfere instantaneamente"
+msgstr "Transfere instantaneamente"
+
+msgid "Limpar briga sem deletar nada."
+msgstr "Limpar briga sem deletar nada."
+
+msgid "Exterminar repetidos e ser o #1."
+msgstr "Exterminar repetidos e ser o #1."
+
+msgid "Entendi!"
+msgstr "Entendi!"
+
+msgid "Cancel"
+msgstr "Cancelar"
