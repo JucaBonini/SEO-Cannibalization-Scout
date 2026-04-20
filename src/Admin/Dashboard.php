@@ -81,8 +81,15 @@ class Dashboard {
             .sts-vs-circle { background:#d63638; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; }
             .sts-stat-card { background:#f8fafc; padding:20px; border-radius:10px; flex:1; text-align:center; border:1px solid #e2e8f0; }
             .sts-stat-val { display:block; font-size:28px; font-weight:800; color:#d63638; }
-            .sts-help-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
+            .sts-help-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); }
             .sts-modal-content { background:#fff; margin:5% auto; padding:35px; border-radius:12px; width:700px; max-width:95%; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.2); }
+            .sts-choice-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; transition: 0.3s; cursor: pointer; margin-bottom: 15px; position: relative; overflow: hidden; }
+            .sts-choice-card:hover { border-color: #d63638; background: #fffaf0; transform: translateY(-3px); }
+            .sts-choice-card.active { border-color: #d63638; background: #fffaf0; }
+            .sts-choice-card h4 { margin: 0 0 5px 0; color: #1a202c; }
+            .sts-choice-card p { margin: 0; font-size: 13px; color: #718096; }
+            .sts-resolve-confirm { background: #d63638; color: #fff; width: 100%; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+            .sts-resolve-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
         ");
     }
 
@@ -203,6 +210,39 @@ class Dashboard {
                 </div>
             </div>
 
+            <!-- NOVO MODAL DE RESOLUÇÃO PREMIUM -->
+            <div id="sts-resolve-modal" class="sts-help-modal">
+                <div class="sts-modal-content" style="width: 550px;">
+                    <div style="text-align: right; margin-bottom: -10px;">
+                        <span onclick="jQuery('#sts-resolve-modal').fadeOut()" style="cursor:pointer; font-size:20px; color:#cbd5e0;">&times;</span>
+                    </div>
+                    <h3 style="margin-top:0; color:#1a202c;"><?php _e('Blindar Autoridade','seo-cannibalization-scout');?></h3>
+                    <p style="color:#718096; margin-bottom:25px;"><?php _e('Escolha o método de aniquilação da canibalização:','seo-cannibalization-scout');?></p>
+                    
+                    <div class="sts-choice-card" data-type="canonical">
+                        <div style="display:flex; gap:15px; align-items:center;">
+                            <div style="background:#ebf8ff; color:#3182ce; padding:10px; border-radius:10px;">🛡️</div>
+                            <div>
+                                <h4><?php _e('Poder da Autoridade (Canonical)','seo-cannibalization-scout');?></h4>
+                                <p><?php _e('Une a força das duas URLs sem apagar nada. Seguro e elegante.','seo-cannibalization-scout');?></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sts-choice-card" data-type="redirect">
+                        <div style="display:flex; gap:15px; align-items:center;">
+                            <div style="background:#fff5f5; color:#e53e3e; padding:10px; border-radius:10px;">⚔️</div>
+                            <div>
+                                <h4><?php _e('Modo Aniquilação (Redirect 301)','seo-cannibalization-scout');?></h4>
+                                <p><?php _e('Mata a página fraca e manda tudo para a Master. 100% garantido.','seo-cannibalization-scout');?></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="sts-confirm-resolve-btn" class="sts-resolve-confirm" style="display:none; transition: 0.3s;"><?php _e('EXECUTAR RESOLUÇÃO','seo-cannibalization-scout');?></button>
+                </div>
+            </div>
+
             <script>
             const sts_i18n = <?php echo json_encode($i18n); ?>;
             jQuery(document).ready(function($) {
@@ -214,14 +254,75 @@ class Dashboard {
                     $.post(ajaxurl, {action:'sts_cannibal_save_lang', lang:$(this).val()}, function(){ location.reload(); });
                 });
                 $('#save-gsc-config').on('click', function() {
+                    const btn = $(this);
+                    btn.prop('disabled', true).text('Saving...');
                     $.post(ajaxurl,{action:'sts_cannibal_save_gsc',client_id:$('#gsc-client-id').val(),client_secret:$('#gsc-client-secret').val()},function(res){
                         if(res.success) window.location.href=res.data.auth_url;
+                        else { alert('Error saving config.'); btn.prop('disabled', false).text('Save'); }
                     });
                 });
+
+            // Função MODO DEUS de Resolução
+                let currentConflictIndex = null;
+                let currentBtnElem = null;
+
+                window.stsResolveConflict = function(index, btnElem) {
+                    currentConflictIndex = index;
+                    currentBtnElem = btnElem;
+                    $('#sts-resolve-modal').fadeIn();
+                };
+
+                window.stsExecuteResolution = function(type) {
+                    const conflict = window.scout_conflicts[currentConflictIndex];
+                    const $btn = $(currentBtnElem);
+                    const $resolveBtn = $('#sts-confirm-resolve-btn');
+                    
+                    $resolveBtn.prop('disabled', true).html('<span class="spinner is-active" style="float:none;"></span> Processando...');
+
+                    $.post(ajaxurl, {
+                        action: 'sts_cannibal_resolve_issue',
+                        _ajax_nonce: '<?php echo wp_create_nonce("cannibal_resolve_nonce"); ?>',
+                        post_from: conflict.id1,
+                        post_to_url: conflict.url2,
+                        resolve_type: type
+                    }, function(res) {
+                        $('#sts-resolve-modal').fadeOut();
+                        $resolveBtn.prop('disabled', false).text('EXECUTAR RESOLUÇÃO');
+                        
+                        if (res.success) {
+                            $btn.closest('.sts-conflict-card').css('border-left-color', type === 'redirect' ? '#4a5568' : '#22c55e');
+                            $btn.closest('.sts-conflict-card').fadeOut(800, function() {
+                                $(this).remove();
+                                const $count = $('.sts-stat-val').last();
+                                $count.text(parseInt($count.text()) - 1);
+                                if (parseInt($count.text()) === 0) {
+                                    $('#sts-audit-results').html('<div style="text-align:center; padding:40px;"><h2 style="color:#22c55e;">🛡️ ESTRUTURA BLINDADA! Todos os conflitos foram aniquilados.</h2></div>');
+                                }
+                            });
+                        } else {
+                            alert('Erro: ' + (res.data || 'Falha na comunicação.'));
+                        }
+                    });
+                };
+
+                $('.sts-choice-card').on('click', function() {
+                    $('.sts-choice-card').removeClass('active');
+                    $(this).addClass('active');
+                    $('#sts-confirm-resolve-btn').data('type', $(this).data('type')).fadeIn();
+                });
+
+                $('#sts-confirm-resolve-btn').on('click', function() {
+                    window.stsExecuteResolution($(this).data('type'));
+                });
+
                 $('#run-audit-action').on('click', function() {
                     const btn=$(this); const loader=$('#sts-audit-loader'); const res_div=$('#sts-audit-results');
                     const types=$('input[name="post_types[]"]:checked').map(function(){return $(this).val();}).get();
+                    
+                    if (types.length === 0) { alert('Selecione ao menos um tipo de conteúdo.'); return; }
+                    
                     btn.prop('disabled',true).text(sts_i18n.scanning); res_div.fadeOut(); loader.fadeIn();
+                    
                     $.post(ajaxurl,{action:'sts_cannibal_run_audit',types:types,_ajax_nonce:'<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>'},function(res){
                         btn.prop('disabled',false).html('🚀 ' + sts_i18n.start_action);
                         loader.fadeOut(function(){
@@ -230,25 +331,23 @@ class Dashboard {
                                 res.data.conflicts.forEach((item,index)=>{
                                     h+=`<div class='sts-conflict-card' id='conflict-${index}'>
                                         <div class='sts-duel-grid'>
-                                            <div class='sts-url-box' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
-                                                <span class='sts-badge' style='background:#e2e8f0; color:#4a5568;'>${item.type1}</span><br><strong>/${item.post1}/</strong>
+                                            <div class='sts-url-box' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638; box-shadow: 0 0 10px rgba(214, 54, 56, 0.1);'}'>
+                                                <span class='sts-badge' style='background:#e2e8f0; color:#4a5568; font-size:9px; padding:2px 6px; border-radius:4px; text-transform:uppercase;'>${item.type1}</span><br><strong>/${item.post1}/</strong>
                                                 <div class='sts-metrics-row'>
-                                                    <div class='sts-metric-tag'>🖱️ ${item.gsc1.clicks} ${sts_i18n.clicks_label}</div>
-                                                    <div class='sts-metric-tag'>👁️ ${item.gsc1.impressions} ${sts_i18n.views_label}</div>
-                                                    <div class='sts-metric-tag'>📊 ${item.gsc1.impressions} ${sts_i18n.impress_label}</div>
+                                                    <div class='sts-metric-tag' title='Cliques no último mês'>🖱️ ${item.gsc1.clicks}</div>
+                                                    <div class='sts-metric-tag' title='Impressões no Search Console'>👁️ ${item.gsc1.impressions}</div>
                                                 </div>
                                             </div>
-                                            <div class='sts-vs-circle'>VS</div>
-                                            <div class='sts-url-box' style='${item.gsc2.clicks < item.gsc1.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
-                                                <span class='sts-badge' style='background:#e2e8f0; color:#4a5568;'>${item.type2}</span><br><strong>/${item.post2}/</strong>
+                                            <div class='sts-vs-circle' style='box-shadow: 0 4px 10px rgba(214, 54, 56, 0.3);'>VS</div>
+                                            <div class='sts-url-box' style='${item.gsc2.clicks < item.gsc1.clicks ? 'opacity:0.6' : 'border:2px solid #d63638; box-shadow: 0 0 10px rgba(214, 54, 56, 0.1);'}'>
+                                                <span class='sts-badge' style='background:#e2e8f0; color:#4a5568; font-size:9px; padding:2px 6px; border-radius:4px; text-transform:uppercase;'>${item.type2}</span><br><strong>/${item.post2}/</strong>
                                                 <div class='sts-metrics-row'>
-                                                    <div class='sts-metric-tag'>🖱️ ${item.gsc2.clicks} ${sts_i18n.clicks_label}</div>
-                                                    <div class='sts-metric-tag'>👁️ ${item.gsc2.impressions} ${sts_i18n.views_label}</div>
-                                                    <div class='sts-metric-tag'>📊 ${item.gsc2.impressions} ${sts_i18n.impress_label}</div>
+                                                    <div class='sts-metric-tag'>🖱️ ${item.gsc2.clicks}</div>
+                                                    <div class='sts-metric-tag'>👁️ ${item.gsc2.impressions}</div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button class='button button-primary' onclick='alert("Resolving...")' style='margin-left:20px;'>${sts_i18n.resolve_btn}</button>
+                                        <button class='button button-primary' onclick='stsResolveConflict(${index}, this)' style='margin-left:20px; font-weight:700;'>${sts_i18n.resolve_btn}</button>
                                     </div>`;
                                 });
                                 res_div.html(h).fadeIn(); window.scout_conflicts=res.data.conflicts;
@@ -299,7 +398,26 @@ class Dashboard {
     }
 
     public function ajax_resolve_issue() {
-        update_post_meta((int)$_POST['post_from'],'_sts_seo_canonical',esc_url_raw($_POST['post_to_url']));
+        check_ajax_referer('cannibal_resolve_nonce');
+        
+        $post_from = isset($_POST['post_from']) ? (int)$_POST['post_from'] : 0;
+        $post_to_url = isset($_POST['post_to_url']) ? esc_url_raw($_POST['post_to_url']) : '';
+        $type = isset($_POST['resolve_type']) ? sanitize_text_field($_POST['resolve_type']) : 'canonical';
+
+        if (!$post_from || !$post_to_url) {
+            wp_send_json_error('Parâmetros inválidos.');
+        }
+
+        if ($type === 'redirect') {
+            // Modo Aniquilação (301)
+            update_post_meta($post_from, '_sts_seo_redirect', $post_to_url);
+            delete_post_meta($post_from, '_sts_seo_canonical'); // Remove canonical para não conflitar
+        } else {
+            // Modo Autoridade (Canonical)
+            update_post_meta($post_from, '_sts_seo_canonical', $post_to_url);
+            delete_post_meta($post_from, '_sts_seo_redirect'); // Remove redirect se houver
+        }
+
         wp_send_json_success();
     }
 }
