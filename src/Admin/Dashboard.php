@@ -24,19 +24,19 @@ class Dashboard {
     public function enqueue_assets($hook) {
         if ('toplevel_page_seo-cannibalization-scout' !== $hook) return;
         wp_add_inline_style('wp-admin', "
-            .sts-scout-container { display: grid; grid-template-columns: 1fr 380px; gap: 25px; max-width: 1400px; margin-top: 20px; align-items: start; }
+            .sts-scout-container { max-width: 1000px; margin-top: 20px; }
             .sts-scout-card { border-radius: 8px; position:relative; background:#fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccd0d4; overflow:hidden; }
             .sts-scout-header { background: #d63638; color: #fff; padding: 30px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color: #fff !important; margin: 0 !important; font-size: 24px; line-height:1.2; }
             .sts-scout-header p { color: rgba(255,255,255,0.8); margin: 5px 0 0 0; }
             .sts-scout-content { padding: 20px; }
             
-            .sts-scout-sidebar { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; border: 1px solid #ccd0d4; }
-            .sts-scout-sidebar h3 { margin-top: 0; color: #1d2327; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; border:1px solid rgba(255,255,255,0.3); transition:0.3s; }
+            .sts-help-trigger:hover { background:#fff; color:#d63638; }
             
-            .sts-side-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-            .sts-side-table th { text-align: left; background: #f6f7f7; padding: 8px; border: 1px solid #dcdcde; }
-            .sts-side-table td { padding: 8px; border: 1px solid #dcdcde; vertical-align: top; }
+            .sts-side-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+            .sts-side-table th { text-align: left; background: #f6f7f7; padding: 10px; border: 1px solid #dcdcde; }
+            .sts-side-table td { padding: 10px; border: 1px solid #dcdcde; vertical-align: top; }
             .sts-side-tag { display: block; font-weight: 700; margin-bottom: 3px; color: #2271b1; }
 
             .sts-conflict-item { background: #fff; border: 1px solid #ccd0d4; padding: 20px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #d63638; }
@@ -60,11 +60,11 @@ class Dashboard {
         <div class="wrap">
             <div class="sts-scout-container">
                 <div class="sts-scout-card card">
-                    <div class="sts-scout-header">
                         <div>
                             <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
                             <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
                         </div>
+                        <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Comparative Summary', 'seo-cannibalization-scout'); ?>">?</div>
                     </div>
                     <div style="margin-top:20px;">
                         <p><strong><?php _e('Select content types to audit:', 'seo-cannibalization-scout'); ?></strong></p>
@@ -89,34 +89,37 @@ class Dashboard {
                     <div id="scout-results" style="margin-top:30px;"></div>
                 </div>
 
-                <!-- Sidebar de Ajuda -->
-                <div class="sts-scout-sidebar">
+                    <div id="scout-results" style="margin-top:30px;"></div>
+                </div>
+            </div>
+
+            <!-- Modal de Ajuda -->
+            <div id="sts-help-modal" class="sts-audit-modal">
+                <div class="sts-modal-content" style="width:600px;">
                     <h3><?php _e('Resumo Comparativo', 'seo-cannibalization-scout'); ?></h3>
                     <table class="sts-side-table">
                         <tr>
                             <th><?php _e('Característica', 'seo-cannibalization-scout'); ?></th>
+                            <th>Canonical (Autoridade)</th>
+                            <th>Redirect 301 (Mudança)</th>
                         </tr>
                         <tr>
-                            <td>
-                                <span class="sts-side-tag">Canonical (Autoridade)</span>
-                                <?php _e('Post Antigo: Fica online (Visível)', 'seo-cannibalization-scout'); ?><br><br>
-                                <?php _e('SEO: Poder flui lentamente.', 'seo-cannibalization-scout'); ?>
-                            </td>
+                            <td><strong><?php _e('Post Antigo', 'seo-cannibalization-scout'); ?></strong></td>
+                            <td><?php _e('Fica online (Visível)', 'seo-cannibalization-scout'); ?></td>
+                            <td><?php _e('Fica Offline (Draft)', 'seo-cannibalization-scout'); ?></td>
                         </tr>
                         <tr>
-                            <td>
-                                <span class="sts-side-tag">Redirect 301 (Mudança)</span>
-                                <?php _e('Post Antigo: Fica Offline (Draft)', 'seo-cannibalization-scout'); ?><br><br>
-                                <?php _e('SEO: Transfere instantaneamente.', 'seo-cannibalization-scout'); ?>
-                            </td>
+                            <td><strong><?php _e('Poder de SEO', 'seo-cannibalization-scout'); ?></strong></td>
+                            <td><?php _e('Flui lentamente', 'seo-cannibalization-scout'); ?></td>
+                            <td><?php _e('Transfere instantaneamente', 'seo-cannibalization-scout'); ?></td>
                         </tr>
                         <tr>
-                            <td>
-                                <strong><?php _e('Qual escolher?', 'seo-cannibalization-scout'); ?></strong><br>
-                                <small><?php _e('301 para deletar repetidos. Canonical para manter ambos.', 'seo-cannibalization-scout'); ?></small>
-                            </td>
+                            <td><strong><?php _e('Qual escolher?', 'seo-cannibalization-scout'); ?></strong></td>
+                            <td><?php _e('Limpar briga sem deletar nada.', 'seo-cannibalization-scout'); ?></td>
+                            <td><?php _e('Exterminar repetidos e ser o #1.', 'seo-cannibalization-scout'); ?></td>
                         </tr>
                     </table>
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="margin-top:30px; width:100%"><?php _e('Entendi!', 'seo-cannibalization-scout'); ?></button>
                 </div>
             </div>
 
@@ -150,6 +153,10 @@ class Dashboard {
                     resolve: '<?php _e('Resolve', 'seo-cannibalization-scout'); ?>'
                 };
                 const nonce_audit = '<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>';
+
+                $('#open-help-modal').on('click', function() {
+                    $('#sts-help-modal').fadeIn();
+                });
 
                 let currentItem = null;
                 $('#run-scout-btn').on('click', function() {
