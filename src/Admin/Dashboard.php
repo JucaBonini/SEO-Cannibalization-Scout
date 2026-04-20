@@ -37,8 +37,8 @@ class Dashboard {
     public function enqueue_assets($hook) {
         if ('toplevel_page_seo-cannibalization-scout' !== $hook) return;
         wp_add_inline_style('wp-admin', "
-            .sts-scout-card { max-width: 1300px; margin-top: 20px; border-radius: 8px; position:relative; background:#fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccd0d4; overflow:hidden; }
-            .sts-scout-header { background: #d63638; color: #fff; padding: 40px; display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; }
+            .sts-scout-card { max-width: 1300px; margin: 20px auto; border-radius: 8px; position:relative; background:#fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccd0d4; overflow:hidden; }
+            .sts-scout-header { background: #d63638; color: #fff; padding: 40px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color: #fff !important; margin: 0 !important; font-size: 28px; line-height:1.2; }
             .sts-scout-header p { color: rgba(255,255,255,0.8); margin: 5px 0 0 0; }
             
@@ -49,12 +49,27 @@ class Dashboard {
             .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:20px; border:1px solid rgba(255,255,255,0.3); transition:0.3s; }
             .sts-help-trigger:hover { background:#fff; color:#d63638; }
 
-            .sts-scout-content { padding: 0 40px 40px 40px; }
-            .sts-scout-tabs { display:flex; gap:5px; margin-bottom:20px; border-bottom:1px solid #ddd; }
-            .sts-tab-link { padding:10px 20px; cursor:pointer; border:1px solid transparent; border-bottom:none; margin-bottom:-1px; border-radius:5px 5px 0 0; font-weight:600; color:#666; }
+            .sts-scout-content { padding: 30px; }
+            .sts-scout-tabs { display:flex; gap:5px; margin-bottom:20px; border-bottom:1px solid #ddd; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+            .sts-scout-tabs::-webkit-scrollbar { display: none; }
+            .sts-tab-link { padding:10px 20px; cursor:pointer; border:1px solid transparent; border-bottom:none; margin-bottom:-1px; border-radius:5px 5px 0 0; font-weight:600; color:#666; display: inline-block; }
             .sts-tab-link.active { background:#fff; border-color:#ddd; color:#d63638; }
             .sts-tab-content { display:none; }
             .sts-tab-content.active { display:block; }
+
+            /* Mobile Adjustments */
+            @media (max-width: 782px) {
+                .sts-scout-header { padding: 25px 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
+                .sts-scout-header h2 { font-size: 22px; }
+                .sts-scout-header p { font-size: 13px; }
+                .sts-header-group { width: 100%; display: flex !important; justify-content: space-between; align-items: center; }
+                .sts-scout-content { padding: 15px; }
+                .sts-conflict-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+                .sts-conflict-item button { width: 100%; }
+                .sts-modal-content { width: 90% !important; margin: 20% auto; padding: 20px; }
+                .sts-stat-box { padding: 10px; }
+                .sts-stat-num { font-size: 22px; }
+            }
 
             .sts-conflict-item { background: #fff; border: 1px solid #ccd0d4; padding: 20px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #d63638; }
             .sts-conflict-item.warning { border-left-color: #ffb900; }
