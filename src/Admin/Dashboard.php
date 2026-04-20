@@ -152,18 +152,51 @@ class Dashboard {
 
                     <!-- Tab GSC -->
                     <div id="tab-settings" class="sts-tab-content">
-                        <h3><?php _e('Google Search Console Integration', 'seo-cannibalization-scout'); ?></h3>
-                        <p><?php _e('Real-time performance data for all users! Make informed decisions based on clicks and impressions.', 'seo-cannibalization-scout'); ?></p>
-                        <div style="max-width:500px; background:#f6f7f7; padding:20px; border-radius:8px; border:1px solid #ddd;">
-                            <label style="display:block; margin-bottom:10px;">
-                                <strong>Google Client ID:</strong><br>
-                                <input type="text" id="gsc-client-id" class="regular-text" style="width:100%" value="<?php echo esc_attr($gsc_client_id); ?>">
-                            </label>
-                            <label style="display:block; margin-bottom:20px;">
-                                <strong>Google Client Secret:</strong><br>
-                                <input type="password" id="gsc-client-secret" class="regular-text" style="width:100%" value="********">
-                            </label>
-                            <button class="button button-secondary" id="save-gsc-btn"><?php _e('Save Configuration', 'seo-cannibalization-scout'); ?></button>
+                        <div style="display:grid; grid-template-columns: 1fr 350px; gap:40px;">
+                            <div>
+                                <h3><?php _e('Como conectar ao Google Search Console', 'seo-cannibalization-scout'); ?></h3>
+                                <p style="color:#666; margin-bottom:30px;"><?php _e('Siga os passos abaixo para liberar os dados de cliques e impressões no seu painel. É gratuito e leva apenas 5 minutos.', 'seo-cannibalization-scout'); ?></p>
+
+                                <div class="sts-guide-step" style="margin-bottom:25px;">
+                                    <div style="font-weight:bold; color:#d63638; margin-bottom:5px;">1. <?php _e('Crie um projeto no Google Cloud', 'seo-cannibalization-scout'); ?></div>
+                                    <p style="font-size:13px; margin:0;"><?php _e('Acesse o <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> e crie um novo projeto chamado "Scout SEO".', 'seo-cannibalization-scout'); ?></p>
+                                </div>
+
+                                <div class="sts-guide-step" style="margin-bottom:25px;">
+                                    <div style="font-weight:bold; color:#d63638; margin-bottom:5px;">2. <?php _e('Ative a API do Search Console', 'seo-cannibalization-scout'); ?></div>
+                                    <p style="font-size:13px; margin:0;"><?php _e('No menu "APIs e Serviços", clique em "Ativar APIs" e procure por "Google Search Console API". Ative-a.', 'seo-cannibalization-scout'); ?></p>
+                                </div>
+
+                                <div class="sts-guide-step" style="margin-bottom:25px;">
+                                    <div style="font-weight:bold; color:#d63638; margin-bottom:5px;">3. <?php _e('Crie as Credenciais (OAuth)', 'seo-cannibalization-scout'); ?></div>
+                                    <p style="font-size:13px; margin:0;"><?php _e('Vá em "Credenciais" > "Criar Credenciais" > "ID do cliente OAuth". Escolha "Aplicativo da Web".', 'seo-cannibalization-scout'); ?></p>
+                                    <div style="background:#fff9e6; border-left:3px solid #ffb900; padding:10px; margin-top:10px; font-size:12px;">
+                                        <strong>URI de Redirecionamento Autorizado:</strong><br>
+                                        <code style="word-break:break-all;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout'); ?></code>
+                                    </div>
+                                </div>
+
+                                <div class="sts-guide-step">
+                                    <div style="font-weight:bold; color:#d63638; margin-bottom:5px;">4. <?php _e('Cole as Chaves e Salve', 'seo-cannibalization-scout'); ?></div>
+                                    <p style="font-size:13px; margin:0;"><?php _e('Copie o "Client ID" e o "Client Secret" gerados e cole nos campos ao lado.', 'seo-cannibalization-scout'); ?></p>
+                                </div>
+                            </div>
+
+                            <div style="background:#f6f7f7; padding:30px; border-radius:15px; border:1px solid #ddd; height:fit-content;">
+                                <h4 style="margin-top:0;"><?php _e('Configuração das Chaves', 'seo-cannibalization-scout'); ?></h4>
+                                <label style="display:block; margin-bottom:15px;">
+                                    <strong>Google Client ID:</strong><br>
+                                    <input type="text" id="gsc-client-id" class="regular-text" style="width:100%; font-size:12px;" value="<?php echo esc_attr($gsc_client_id); ?>" placeholder="Ex: 12345-abcde.apps.googleusercontent.com">
+                                </label>
+                                <label style="display:block; margin-bottom:20px;">
+                                    <strong>Google Client Secret:</strong><br>
+                                    <input type="password" id="gsc-client-secret" class="regular-text" style="width:100%; font-size:12px;" value="********">
+                                </label>
+                                <button class="button button-primary button-large" style="width:100%;" id="save-gsc-btn"><?php _e('Salvar e Conectar', 'seo-cannibalization-scout'); ?></button>
+                                <p style="font-size:11px; color:#666; margin-top:15px; text-align:center; line-height:1.4;">
+                                    <?php _e('Ao clicar em Salvar, você será levado para o Google para autorizar o acesso aos dados do seu site.', 'seo-cannibalization-scout'); ?>
+                                </p>
+                            </div>
                         </div>
                     </div>
 
