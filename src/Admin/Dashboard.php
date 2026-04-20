@@ -40,8 +40,11 @@ class Dashboard {
         set_transient('sts_scout_gsc_data', $map, DAY_IN_SECONDS); return $map;
     }
 
-    public function force_plugin_locale($locale,$domain) {
-        if($domain==='seo-cannibalization-scout'){ $ul=get_user_meta(get_current_user_id(),'sts_scout_lang',true); if($ul) return $ul; }
+    public function force_plugin_locale($locale, $domain) {
+        if ($domain === 'seo-cannibalization-scout') {
+            $user_lang = get_user_meta(get_current_user_id(), 'sts_scout_lang', true);
+            if ($user_lang) return $user_lang;
+        }
         return $locale;
     }
 
@@ -56,38 +59,34 @@ class Dashboard {
             .sts-scout-header { background:#d63638; color:#fff; padding:30px 40px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color:#fff!important; margin:0!important; font-size:26px; }
             .sts-scout-header p { color:rgba(255,255,255,0.8); margin:5px 0 0 0; font-size:13px; }
-            .sts-header-actions { display:flex; align-items:center; gap:15px; }
-            .sts-lang-selector { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:12px; }
-            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; transition:0.3s; border:1px solid rgba(255,255,255,0.3); }
-            .sts-help-trigger:hover { background:#fff; color:#d63638; }
+            .sts-help-trigger { background:rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:18px; border:1px solid rgba(255,255,255,0.3); }
             .sts-scout-content { padding:30px; }
-            .sts-scout-tabs { display:flex; gap:5px; border-bottom:1px solid #ddd; margin-bottom:20px; overflow-x:auto; }
-            .sts-tab-link { padding:10px 20px; cursor:pointer; border:1px solid transparent; border-bottom:none; border-radius:5px 5px 0 0; font-weight:600; color:#666; margin-bottom:-1px; }
+            .sts-scout-tabs { display:flex; gap:5px; border-bottom:1px solid #ddd; margin-bottom:20px; }
+            .sts-tab-link { padding:10px 20px; cursor:pointer; font-weight:600; color:#666; border:1px solid transparent; border-bottom:none; border-radius:5px 5px 0 0; margin-bottom:-1px; }
             .sts-tab-link.active { background:#fff; border-color:#ddd; color:#d63638; }
             .sts-tab-content { display:none; }
             .sts-tab-content.active { display:block; }
             .sts-conflict-item { background:#fff; border:1px solid #ccd0d4; padding:25px; margin-bottom:15px; border-radius:8px; border-left:6px solid #d63638; display:flex; justify-content:space-between; align-items:center; }
             .sts-conflict-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; width:100%; }
-            .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; overflow:hidden; }
+            .sts-url-unit { background:#f9fafa; padding:15px; border-radius:8px; border:1px solid #eee; }
             .sts-type-tag { font-size:10px; text-transform:uppercase; font-weight:bold; padding:2px 6px; border-radius:4px; margin-bottom:8px; display:inline-block; }
             .sts-type-post { background:#e0f2fe; color:#0369a1; }
             .sts-type-story { background:#fef3c7; color:#92400e; }
-            .sts-gsc-mini-badge { background:#fff; border:1px solid #ddd; padding:4px 8px; border-radius:4px; font-size:11px; margin-top:8px; display:inline-flex; align-items:center; gap:5px; }
             .sts-vs-icon { background:#d63638; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; }
             .sts-stat-box { background:#f6f7f7; padding:15px; border-radius:4px; flex:1; text-align:center; border:1px solid #dcdcde; }
+            .sts-stat-num { display:block; font-size:28px; font-weight:700; color:#d63638; }
+            .sts-loading-area { text-align:center; padding:50px; display:none; }
+            .sts-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #d63638; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             .sts-step-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:15px; position:relative; }
             .sts-step-num { position:absolute; left:-12px; top:15px; background:#d63638; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; }
-            @media (max-width: 782px) { .sts-scout-header { flex-direction:column; align-items:flex-start; gap:20px; } .sts-conflict-grid { grid-template-columns:1fr; } }
             .sts-audit-modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
-            .sts-modal-content { background:#fff; margin:5% auto; padding:35px; border-radius:12px; width:650px; max-width:90%; position:relative; }
-            .sts-help-section { margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px; }
-            .sts-help-section h4 { color:#d63638; margin:0 0 10px 0; }
+            .sts-modal-content { background:#fff; margin:10% auto; padding:35px; border-radius:12px; width:650px; max-width:90%; position:relative; }
         ");
     }
 
     public function render_page() {
         $is_authed = get_option('sts_scout_gsc_auth_code', false);
-        $current_lang = get_user_meta(get_current_user_id(), 'sts_scout_lang', true) ?: get_locale();
         ?>
         <div class="wrap" style="max-width:1300px; margin:20px auto;">
             <div class="sts-scout-card card">
@@ -105,7 +104,7 @@ class Dashboard {
                     <div class="sts-scout-tabs">
                         <div class="sts-tab-link active" data-tab="audit"><?php _e('Audit Dashboard','seo-cannibalization-scout');?></div>
                         <div class="sts-tab-link" data-tab="settings"><?php _e('GSC Integration','seo-cannibalization-scout');?> <?php echo $is_authed?'✅':'';?></div>
-                        <div class="sts-tab-link" data-tab="support"><?php _e('Review & Support','seo-cannibalization-scout');?></div>
+                        <div class="sts-tab-link" data-tab="support"><?php _e('Support','seo-cannibalization-scout');?></div>
                     </div>
 
                     <div id="tab-audit" class="sts-tab-content active">
@@ -121,7 +120,14 @@ class Dashboard {
                                 </label>
                             <?php endforeach;?>
                         </div>
-                        <button class="button button-primary button-large" id="run-scout-btn">Start Surgical Scan</button>
+                        <button class="button button-primary button-large" id="run-scout-btn">🚀 Start Surgical Scan</button>
+                        
+                        <div id="sts-loader" class="sts-loading-area">
+                            <div class="sts-spinner"></div>
+                            <h3 style="margin-bottom:5px;">Scout está trabalhando...</h3>
+                            <p style="color:#666;">Varrendo seu conteúdo e cruzando dados com o Google.</p>
+                        </div>
+
                         <div id="scout-results" style="margin-top:30px;"></div>
                     </div>
 
@@ -129,63 +135,27 @@ class Dashboard {
                         <div style="display:grid; grid-template-columns: 1fr 380px; gap:40px;">
                             <div>
                                 <h3 style="margin-top:0;">🛑 Guia Passo-a-Passo (Para Iniciantes)</h3>
-                                <p style="color:#666; margin-bottom:30px;">Siga estes passos simples para conectar seu Google Search Console:</p>
-                                <div class="sts-step-card"><div class="sts-step-num">1</div><strong>Acesse o Google Cloud</strong><br><span style="font-size:12px;">Vá em <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> e crie um projeto chamado <b>Scout SEO</b>.</span></div>
-                                <div class="sts-step-card"><div class="sts-step-num">2</div><strong>Ative a API</strong><br><span style="font-size:12px;">Vá em "APIs e Serviços" > "Biblioteca". Ative a <b>Google Search Console API</b>.</span></div>
-                                <div class="sts-step-card"><div class="sts-step-num">3</div><strong>Crie Credenciais OAuth</strong><br><span style="font-size:12px;">Em "Credenciais" > "Criar Credenciais" > "ID do cliente OAuth". Escolha "Aplicativo Web".</span></div>
-                                <div class="sts-step-card" style="background:#fff9e6;"><div class="sts-step-num">4</div><strong>Configuração de URI</strong><br><span style="font-size:12px;">Cole este link no campo "URIs de redirecionamento autorizados":</span><br><code style="display:block; background:#fff; padding:10px; margin-top:10px; border:1px solid #ddd; word-break:break-all;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code></div>
+                                <div class="sts-step-card"><div class="sts-step-num">1</div><strong>Acesse o Google Cloud</strong><br><span style="font-size:12px;">Vá em <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> e crie o projeto <b>Scout SEO</b>.</span></div>
+                                <div class="sts-step-card"><div class="sts-step-num">2</div><strong>Ative a API</strong><br><span style="font-size:12px;">Ative a <b>Google Search Console API</b> na biblioteca.</span></div>
+                                <div class="sts-step-card" style="background:#fff9e6;"><div class="sts-step-num">3</div><strong>Redirect URI:</strong><br><code style="display:block; background:#fff; padding:10px; margin-top:10px; border:1px solid #ddd; font-size:11px; word-break:break-all;"><?php echo admin_url('admin.php?page=seo-cannibalization-scout');?></code></div>
                             </div>
-                            <div style="background:#f6f7f7; padding:30px; border-radius:15px; border:1px solid #ddd; height:fit-content;">
-                                <label style="display:block; margin-bottom:15px;"><strong>Google Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" placeholder="..." value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label>
-                                <label style="display:block; margin-bottom:20px;"><strong>Google Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label>
-                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-btn">🚀 Salvar e Autorizar Google</button>
+                            <div style="background:#f6f7f7; padding:30px; border-radius:15px; border:1px solid #ddd;">
+                                <label><strong>Client ID:</strong><br><input type="text" id="gsc-client-id" style="width:100%" value="<?php echo esc_attr(get_option('sts_scout_gsc_client_id'));?>"></label><br><br>
+                                <label><strong>Client Secret:</strong><br><input type="password" id="gsc-client-secret" style="width:100%" value="********"></label><br><br>
+                                <button class="button button-primary button-large" style="width:100%" id="save-gsc-btn">Salvar e Conectar</button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="tab-support" class="sts-tab-content">
-                        <div style="text-align:center; padding:40px;">
-                             <h2 style="margin-top:0;">Support the Project</h2>
-                             <div style="display:flex; justify-content:center; gap:15px;">
-                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=2.00&currency_code=USD" target="_blank" class="button button-hero" style="min-width:120px;">$2.00</a>
-                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=5.00&currency_code=USD" target="_blank" class="button button-hero button-primary" style="min-width:120px;">$5.00</a>
-                                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=10.00&currency_code=USD" target="_blank" class="button button-hero" style="min-width:120px; background:#111 !important; color:#fff !important;">$10.00</a>
-                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Ajuda Completo -->
             <div id="sts-help-modal" class="sts-audit-modal">
                 <div class="sts-modal-content">
-                    <h3 style="margin-top:0; border-bottom:2px solid #d63638; padding-bottom:10px;">🛡️ Central de Ajuda do Scout</h3>
-                    
-                    <div class="sts-help-section">
-                        <h4>O que é Canibalização de SEO?</h4>
-                        <p style="font-size:13px; line-height:1.5;">Ocorre quando você tem duas ou mais URLs competindo pela mesma palavra-chave. Isso confunde o Google e divide sua autoridade, fazendo você perder posições.</p>
-                    </div>
-
-                    <div class="sts-help-section">
-                        <h4>Como usar os dados do Google (GSC)?</h4>
-                        <p style="font-size:13px; line-height:1.5;">O plugin compara os cliques reais. A URL com **MAIS cliques** (o vencedor) deve ser mantida. A URL com menos cliques deve ser "resolvida".</p>
-                    </div>
-
-                    <div class="sts-help-section">
-                        <h4>Principais Soluções:</h4>
-                        <p style="font-size:13px; line-height:1.5;">
-                            <b>1. Canonical (Recomendado):</b> Avisa ao Google que a URL 'A' é a principal, mas mantém a 'B' ativa para os usuários.<br><br>
-                            <b>2. Redirecionamento 301:</b> Move permanentemente o tráfego de 'B' para 'A'. Use quando o conteúdo for idêntico.
-                        </p>
-                    </div>
-
-                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary button-large" style="width:100%">Entendi, vamos auditar!</button>
+                    <h3 style="border-bottom:2px solid #d63638; padding-bottom:10px;">🛡️ Ajuda do Scout</h3>
+                    <p><b>1. O que é Canibalização?</b> Duas URLs competindo pela mesma palavra-chave.</p>
+                    <p><b>2. Como resolver?</b> Use os cliques do Google para decidir qual URL manter como 'Master'.</p>
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="width:100%">Fechar</button>
                 </div>
-            </div>
-
-            <div id="sts-resolve-modal" class="sts-audit-modal">
-                <div class="sts-modal-content"><h3>Resolver Conflito</h3><p>Deseja aplicar a Tag Canonical para a URL com mais cliques?</p>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;"><button class="button" onclick="jQuery('#sts-resolve-modal').fadeOut()">Cancelar</button><button class="button button-primary" id="final-resolve-btn">Confirmar</button></div></div>
             </div>
 
             <script>
@@ -194,42 +164,43 @@ class Dashboard {
                     $('.sts-tab-link, .sts-tab-content').removeClass('active');
                     $(this).addClass('active'); $('#tab-'+$(this).data('tab')).addClass('active');
                 });
-                $('#save-gsc-btn').on('click', function() {
-                    $.post(ajaxurl,{action:'sts_cannibal_save_gsc',client_id:$('#gsc-client-id').val(),client_secret:$('#gsc-client-secret').val()},function(res){
-                        if(res.success) window.location.href=res.data.auth_url;
-                    });
-                });
                 $('#run-scout-btn').on('click', function() {
+                    const btn = $(this);
+                    const loader = $('#sts-loader');
+                    const results = $('#scout-results');
                     const types = $('input[name="post_types[]"]:checked').map(function(){ return $(this).val(); }).get();
+
+                    btn.prop('disabled', true).text('⏳ Scaneando...');
+                    results.fadeOut();
+                    loader.fadeIn();
+
                     $.post(ajaxurl, {action:'sts_cannibal_run_audit', types:types, _ajax_nonce:'<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>'}, function(res) {
-                        if(res.success) {
-                            let h = `<div style='display:flex;gap:20px;margin-bottom:30px;'><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.total_posts}</span> Items</div><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.conflicts.length}</span> Conflicts</div></div>`;
-                            res.data.conflicts.forEach((item, index) => {
-                                h += `<div class='sts-conflict-item' id='item-${index}'>
-                                    <div class='sts-conflict-grid'>
-                                        <div class='sts-url-unit' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
-                                            <span class='sts-type-tag sts-type-${item.type1}'>${item.type1}</span><br><strong>/${item.post1}/</strong>
-                                            <div class='sts-gsc-mini-badge'>📊 ${item.gsc1.clicks} clicks</div>
+                        btn.prop('disabled', false).html('🚀 Start Surgical Scan');
+                        loader.fadeOut(function() {
+                            if(res.success) {
+                                let h = `<div style='display:flex;gap:20px;margin-bottom:30px;'><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.total_posts}</span> Items</div><div class='sts-stat-box'><span class='sts-stat-num'>${res.data.conflicts.length}</span> Conflicts</div></div>`;
+                                res.data.conflicts.forEach((item, index) => {
+                                    h += `<div class='sts-conflict-item' id='item-${index}'>
+                                        <div class='sts-conflict-grid'>
+                                            <div class='sts-url-unit' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
+                                                <span class='sts-type-tag sts-type-${item.type1}'>${item.type1}</span><br><strong>/${item.post1}/</strong>
+                                                <div class='sts-gsc-mini-badge'>📊 ${item.gsc1.clicks} clicks</div>
+                                            </div>
+                                            <div class='sts-vs-icon'>VS</div>
+                                            <div class='sts-url-unit' style='${item.gsc2.clicks < item.gsc1.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
+                                                <span class='sts-type-tag sts-type-${item.type2}'>${item.type2}</span><br><strong>/${item.post2}/</strong>
+                                                <div class='sts-gsc-mini-badge'>📊 ${item.gsc2.clicks} clicks</div>
+                                            </div>
                                         </div>
-                                        <div class='sts-vs-icon'>VS</div>
-                                        <div class='sts-url-unit' style='${item.gsc2.clicks < item.gsc1.clicks ? 'opacity:0.6' : 'border:2px solid #d63638'}'>
-                                            <span class='sts-type-tag sts-type-${item.type2}'>${item.type2}</span><br><strong>/${item.post2}/</strong>
-                                            <div class='sts-gsc-mini-badge'>📊 ${item.gsc2.clicks} clicks</div>
-                                        </div>
-                                    </div>
-                                    <button class='button resolve-btn' data-index='${index}' style='margin-left:20px;'>Resolve</button>
-                                </div>`;
-                            });
-                            $('#scout-results').html(h); window.audit_items=res.data.conflicts;
-                        }
+                                        <button class='button resolve-btn' data-index='${index}'>Resolve</button>
+                                    </div>`;
+                                });
+                                results.html(h).fadeIn(); window.audit_items=res.data.conflicts;
+                            }
+                        });
                     });
                 });
                 $(document).on('click','.resolve-btn',function(){ currentItem=window.audit_items[$(this).data('index')]; currentItem.dom_id='#item-'+$(this).data('index'); $('#sts-resolve-modal').fadeIn(); });
-                $('#final-resolve-btn').on('click',function(){
-                    $.post(ajaxurl,{action:'sts_cannibal_resolve_issue',post_from:currentItem.id1,post_to_url:currentItem.url2},function(res){
-                        if(res.success) $(currentItem.dom_id).fadeOut(); $('#sts-resolve-modal').fadeOut();
-                    });
-                });
             });
             </script>
         </div>
