@@ -12,6 +12,20 @@ class Dashboard {
         add_action('wp_ajax_sts_cannibal_save_gsc', [$this, 'ajax_save_gsc']);
         
         add_filter('plugin_locale', [$this, 'force_plugin_locale'], 10, 2);
+        
+        // Capturar o retorno do Google
+        add_action('admin_init', [$this, 'handle_google_auth_callback']);
+    }
+
+    public function handle_google_auth_callback() {
+        if (isset($_GET['page']) && $_GET['page'] === 'seo-cannibalization-scout' && isset($_GET['code'])) {
+            $code = sanitize_text_field($_GET['code']);
+            // Aqui futuramente faremos a troca do CODE pelo TOKEN (v1.5)
+            // Por enquanto, salvamos que a autorização foi recebida
+            update_option('sts_scout_gsc_auth_code', $code);
+            wp_redirect(admin_url('admin.php?page=seo-cannibalization-scout&auth=success'));
+            exit;
+        }
     }
 
     public function force_plugin_locale($locale, $domain) {
@@ -97,8 +111,13 @@ class Dashboard {
         $current_lang = get_user_meta(get_current_user_id(), 'sts_scout_lang', true);
         if (!$current_lang) $current_lang = get_locale();
         $gsc_client_id = get_option('sts_scout_gsc_client_id', '');
+        $is_authed = get_option('sts_scout_gsc_auth_code', false);
         ?>
         <div class="wrap" style="max-width: 1300px; margin: 20px auto;">
+            <?php if (isset($_GET['auth']) && $_GET['auth'] === 'success') : ?>
+                <div class="notice notice-success is-dismissible"><p>✅ <?php _e('Conectado ao Google com sucesso!', 'seo-cannibalization-scout'); ?></p></div>
+            <?php endif; ?>
+
             <div class="sts-scout-card card">
                 <div class="sts-scout-header">
                     <div style="display:flex; align-items:center; gap:20px;">
@@ -120,7 +139,7 @@ class Dashboard {
                 <div class="sts-scout-content">
                     <div class="sts-scout-tabs">
                         <div class="sts-tab-link active" data-tab="audit"><?php _e('Audit Dashboard', 'seo-cannibalization-scout'); ?></div>
-                        <div class="sts-tab-link" data-tab="settings"><?php _e('GSC Integration', 'seo-cannibalization-scout'); ?></div>
+                        <div class="sts-tab-link" data-tab="settings"><?php _e('GSC Integration', 'seo-cannibalization-scout'); ?> <?php echo $is_authed ? '✅' : ''; ?></div>
                         <div class="sts-tab-link" data-tab="about"><?php _e('Review & Support', 'seo-cannibalization-scout'); ?></div>
                     </div>
 
@@ -146,7 +165,6 @@ class Dashboard {
                             </button>
                             <span class="spinner" id="scout-spinner"></span>
                         </div>
-                        
                         <div id="scout-results" style="margin-top:30px;"></div>
                     </div>
 
@@ -155,7 +173,7 @@ class Dashboard {
                         <div style="display:grid; grid-template-columns: 1fr 350px; gap:40px;">
                             <div>
                                 <h3><?php _e('Como conectar ao Google Search Console', 'seo-cannibalization-scout'); ?></h3>
-                                <p style="color:#666; margin-bottom:30px;"><?php _e('Siga os passos abaixo para liberar os dados de cliques e impressões no seu painel. É gratuito e leva apenas 5 minutos.', 'seo-cannibalization-scout'); ?></p>
+                                <p style="color:#666; margin-bottom:30px;"><?php _e('Siga os passos abaixo para liberar os dados de cliques e impressões no seu painel.', 'seo-cannibalization-scout'); ?></p>
 
                                 <div class="sts-guide-step" style="margin-bottom:25px;">
                                     <div style="font-weight:bold; color:#d63638; margin-bottom:5px;">1. <?php _e('Crie um projeto no Google Cloud', 'seo-cannibalization-scout'); ?></div>
@@ -186,15 +204,15 @@ class Dashboard {
                                 <h4 style="margin-top:0;"><?php _e('Configuração das Chaves', 'seo-cannibalization-scout'); ?></h4>
                                 <label style="display:block; margin-bottom:15px;">
                                     <strong>Google Client ID:</strong><br>
-                                    <input type="text" id="gsc-client-id" class="regular-text" style="width:100%; font-size:12px;" value="<?php echo esc_attr($gsc_client_id); ?>" placeholder="Ex: 12345-abcde.apps.googleusercontent.com">
+                                    <input type="text" id="gsc-client-id" class="regular-text" style="width:100%; font-size:11px;" value="<?php echo esc_attr($gsc_client_id); ?>">
                                 </label>
                                 <label style="display:block; margin-bottom:20px;">
                                     <strong>Google Client Secret:</strong><br>
-                                    <input type="password" id="gsc-client-secret" class="regular-text" style="width:100%; font-size:12px;" value="********">
+                                    <input type="password" id="gsc-client-secret" class="regular-text" style="width:100%; font-size:11px;" value="********">
                                 </label>
                                 <button class="button button-primary button-large" style="width:100%;" id="save-gsc-btn"><?php _e('Salvar e Conectar', 'seo-cannibalization-scout'); ?></button>
                                 <p style="font-size:11px; color:#666; margin-top:15px; text-align:center; line-height:1.4;">
-                                    <?php _e('Ao clicar em Salvar, você será levado para o Google para autorizar o acesso aos dados do seu site.', 'seo-cannibalization-scout'); ?>
+                                    <?php _e('Ao clicar em Salvar, você será levado para o Google para autorizar o acesso.', 'seo-cannibalization-scout'); ?>
                                 </p>
                             </div>
                         </div>
@@ -211,18 +229,15 @@ class Dashboard {
                             <a href="https://wordpress.org/support/plugin/seo-cannibalization-scout/reviews/#new-post" target="_blank" class="button button-primary button-large">
                                 <?php _e('Leave a Review', 'seo-cannibalization-scout'); ?>
                             </a>
-
                             <div style="margin-top:60px; border-top:1px solid #eee; padding-top:40px;">
                                 <div style="font-size:40px; margin-bottom:10px;">☕</div>
                                 <h3><?php _e('Support the Project', 'seo-cannibalization-scout'); ?></h3>
                                 <p style="color:#666;"><?php _e('Maintain this free tool and buy the developer a coffee!', 'seo-cannibalization-scout'); ?></p>
-                                
                                 <div style="display:flex; justify-content:center; gap:10px; margin-top:20px; flex-wrap:wrap;">
-                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout+Project&amount=2.00&currency_code=USD" target="_blank" class="button" style="border-color:#d63638; color:#d63638;">$2.00</a>
-                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout+Project&amount=5.00&currency_code=USD" target="_blank" class="button" style="border-color:#d63638; color:#d63638;">$5.00</a>
-                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout+Project&amount=10.00&currency_code=USD" target="_blank" class="button" style="background:#d63638 !important; color:#fff !important; border:none;">$10.00</a>
+                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=2.00&currency_code=USD" target="_blank" class="button">$2.00</a>
+                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=5.00&currency_code=USD" target="_blank" class="button">$5.00</a>
+                                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jucasouzabonini@gmail.com&item_name=Support+Scout&amount=10.00&currency_code=USD" target="_blank" class="button" style="background:#d63638!important;color:#fff!important;border:none;">$10.00</a>
                                 </div>
-                                <p style="font-size:11px; color:#999; margin-top:15px;">Secure payment via PayPal</p>
                             </div>
                         </div>
                     </div>
@@ -234,15 +249,11 @@ class Dashboard {
                 <div class="sts-modal-content" style="width:600px;">
                     <h3><?php _e('Resumo Comparativo', 'seo-cannibalization-scout'); ?></h3>
                     <table class="sts-side-table">
-                        <tr>
-                            <th><?php _e('Característica', 'seo-cannibalization-scout'); ?></th>
-                            <th>Canonical (Autoridade)</th>
-                            <th>Redirect 301 (Mudança)</th>
-                        </tr>
-                        <tr><td><strong><?php _e('Post Antigo', 'seo-cannibalization-scout'); ?></strong></td><td><?php _e('Fica online (Visível)', 'seo-cannibalization-scout'); ?></td><td><?php _e('Fica Offline (Draft)', 'seo-cannibalization-scout'); ?></td></tr>
-                        <tr><td><strong><?php _e('Poder de SEO', 'seo-cannibalization-scout'); ?></strong></td><td><?php _e('Flui lentamente', 'seo-cannibalization-scout'); ?></td><td><?php _e('Transfere instantaneamente', 'seo-cannibalization-scout'); ?></td></tr>
+                        <tr><th>Característica</th><th>Canonical</th><th>Redirect 301</th></tr>
+                        <tr><td>Post Antigo</td><td>Online</td><td>Offline</td></tr>
+                        <tr><td>Poder SEO</td><td>Lento</td><td>Instataneo</td></tr>
                     </table>
-                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="margin-top:30px; width:100%"><?php _e('Entendi!', 'seo-cannibalization-scout'); ?></button>
+                    <button onclick="jQuery('#sts-help-modal').fadeOut()" class="button button-primary" style="margin-top:30px; width:100%">Entendi!</button>
                 </div>
             </div>
 
@@ -250,16 +261,10 @@ class Dashboard {
                 <div class="sts-modal-content">
                     <h3><?php _e('How to resolve?', 'seo-cannibalization-scout'); ?></h3>
                     <div class="sts-modal-actions">
-                        <div class="sts-modal-btn" data-action="canonical">
-                            <h4><?php _e('Authority (Canonical)', 'seo-cannibalization-scout'); ?></h4>
-                            <p><?php _e('Keep both URLs online, but point SEO power to master.', 'seo-cannibalization-scout'); ?></p>
-                        </div>
-                        <div class="sts-modal-btn" data-action="redirect">
-                            <h4><?php _e('Redirect (301)', 'seo-cannibalization-scout'); ?></h4>
-                            <p><?php _e('Remove access to this URL and send users to master.', 'seo-cannibalization-scout'); ?></p>
-                        </div>
+                        <div class="sts-modal-btn" data-action="canonical"><h4>Authority</h4><p>Canonical</p></div>
+                        <div class="sts-modal-btn" data-action="redirect"><h4>Redirect</h4><p>301</p></div>
                     </div>
-                    <button onclick="jQuery('#sts-resolve-modal').fadeOut()" class="button" style="margin-top:20px; width:100%"><?php _e('Cancel', 'seo-cannibalization-scout'); ?></button>
+                    <button onclick="jQuery('#sts-resolve-modal').fadeOut()" class="button" style="margin-top:20px; width:100%">Cancel</button>
                 </div>
             </div>
 
@@ -287,13 +292,25 @@ class Dashboard {
 
                 $('#open-help-modal').on('click', function() { $('#sts-help-modal').fadeIn(); });
 
+                $('#save-gsc-btn').on('click', function() {
+                    const id = $('#gsc-client-id').val();
+                    const secret = $('#gsc-client-secret').val();
+                    if (!id || !secret) { alert('Preencha o Client ID e o Secret!'); return; }
+                    
+                    $.post(ajaxurl, { action: 'sts_cannibal_save_gsc', client_id: id, client_secret: secret }, function(res) {
+                        if (res.success && res.data.auth_url) {
+                            window.location.href = res.data.auth_url;
+                        } else {
+                            alert('Erro ao salvar chaves.');
+                        }
+                    });
+                });
+
                 $('#run-scout-btn').on('click', function() {
                     const btn = $(this); const spinner = $('#scout-spinner'); const results = $('#scout-results');
                     const selectedTypes = $('input[name="post_types[]"]:checked').map(function(){ return $(this).val(); }).get();
                     if (selectedTypes.length === 0) return;
-
                     btn.prop('disabled', true); spinner.addClass('is-active'); results.fadeOut();
-
                     $.post(ajaxurl, { action: 'sts_cannibal_run_audit', types: selectedTypes, _ajax_nonce: nonce_audit }, function(response) {
                         btn.prop('disabled', false); spinner.removeClass('is-active');
                         if (response.success) {
@@ -301,27 +318,13 @@ class Dashboard {
                             html += '<div class="sts-stat-box"><span class="sts-stat-num">' + response.data.total_posts + '</span> ' + i18n.posts + '</div>';
                             html += '<div class="sts-stat-box"><span class="sts-stat-num">' + response.data.conflicts.length + '</span> ' + i18n.conflicts + '</div>';
                             html += '</div>';
-
                             if (response.data.conflicts.length > 0) {
                                 html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                                             <h3 style="margin:0;">${i18n.found}</h3>
                                             <button class="button button-secondary" id="bulk-resolve-all">⚡ ${i18n.bulk}</button>
                                          </div>`;
-                                         
                                 response.data.conflicts.forEach((item, index) => {
-                                    html += `
-                                        <div class="sts-conflict-item ${item.status === 'CRÍTICO' ? '' : 'warning'}" id="item-${index}">
-                                            <div>
-                                                <strong>[${item.status}]</strong> ${item.keyword}<br>
-                                                <small style="color:#666;">${item.type1} vs ${item.type2}</small><br>
-                                                <span class="sts-slug-tag">/${item.post1}/</span> vs <span class="sts-slug-tag">/${item.post2}/</span>
-                                                <div class="sts-gsc-badge">
-                                                    <span>📊 Traffic Insights:</span> <strong>(Sync in Settings)</strong>
-                                                </div>
-                                            </div>
-                                            <button class="button button-secondary resolve-btn" data-index="${index}">${i18n.resolve}</button>
-                                        </div>
-                                    `;
+                                    html += `<div class="sts-conflict-item" id="item-${index}"><div><strong>[${item.status}]</strong> ${item.keyword}<br><span class="sts-slug-tag">/${item.post1}/</span> vs <span class="sts-slug-tag">/${item.post2}/</span></div><button class="button button-secondary resolve-btn" data-index="${index}">${i18n.resolve}</button></div>`;
                                 });
                                 window.audit_items = response.data.conflicts;
                             } else { html += '<div class="notice notice-success"><p>' + i18n.none + '</p></div>'; }
@@ -336,23 +339,9 @@ class Dashboard {
                     $('#sts-resolve-modal').fadeIn();
                 });
 
-                $(document).on('click', '#bulk-resolve-all', function() {
-                    if (!confirm('This will resolve all current conflicts using Canonical strategy. Continue?')) return;
-                    $(this).prop('disabled', true).text('Working...');
-                    $.post(ajaxurl, { action: 'sts_cannibal_bulk_resolve', items: window.audit_items }, function(res) {
-                        if (res.success) { location.reload(); }
-                    });
-                });
-                
-                $('#save-gsc-btn').on('click', function() {
-                    const id = $('#gsc-client-id').val();
-                    $.post(ajaxurl, { action: 'sts_cannibal_save_gsc', client_id: id }, function() { alert('Configuration Saved!'); });
-                });
-
                 $('.sts-modal-btn').on('click', function() {
-                    const action = $(this).data('action');
                     if (!currentItem) return;
-                    $.post(ajaxurl, { action: 'sts_cannibal_resolve_issue', type: action, post_from: currentItem.id1, post_to_url: currentItem.url2, slug_from: currentItem.post1 }, function(res) {
+                    $.post(ajaxurl, { action: 'sts_cannibal_resolve_issue', type: $(this).data('action'), post_from: currentItem.id1, post_to_url: currentItem.url2, slug_from: currentItem.post1 }, function(res) {
                         if (res.success) { $(currentItem.dom_id).fadeOut(); }
                         $('#sts-resolve-modal').fadeOut();
                     });
@@ -369,16 +358,25 @@ class Dashboard {
     }
 
     public function ajax_save_gsc() {
-        update_option('sts_scout_gsc_client_id', sanitize_text_field($_POST['client_id']));
-        wp_send_json_success();
+        if (!current_user_can('manage_options')) wp_send_json_error();
+        $client_id = sanitize_text_field($_POST['client_id']);
+        $client_secret = sanitize_text_field($_POST['client_secret']);
+        
+        update_option('sts_scout_gsc_client_id', $client_id);
+        update_option('sts_scout_gsc_client_secret', $client_secret);
+        
+        // Gerar URL de Auth do Google
+        $redirect_uri = urlencode(admin_url('admin.php?page=seo-cannibalization-scout'));
+        $scope = urlencode('https://www.googleapis.com/auth/webmasters.readonly');
+        $auth_url = "https://accounts.google.com/o/oauth2/v2/auth?client_id={$client_id}&redirect_uri={$redirect_uri}&response_type=code&scope={$scope}&access_type=offline&prompt=consent";
+        
+        wp_send_json_success(['auth_url' => $auth_url]);
     }
 
     public function ajax_bulk_resolve() {
         if (!current_user_can('manage_options')) wp_send_json_error();
         $items = $_POST['items'];
-        foreach ($items as $item) {
-            update_post_meta((int)$item['id1'], '_sts_seo_canonical', esc_url_raw($item['url2']));
-        }
+        foreach ($items as $item) { update_post_meta((int)$item['id1'], '_sts_seo_canonical', esc_url_raw($item['url2'])); }
         wp_send_json_success();
     }
 
@@ -386,11 +384,10 @@ class Dashboard {
         if (!current_user_can('manage_options')) wp_send_json_error();
         $type = sanitize_text_field($_POST['type']);
         $post_from = (int) $_POST['post_from'];
-        $post_to_url = esc_url_raw($_POST['post_to_url']);
-        if ($type === 'canonical') { update_post_meta($post_from, '_sts_seo_canonical', $post_to_url); } 
+        if ($type === 'canonical') { update_post_meta($post_from, '_sts_seo_canonical', esc_url_raw($_POST['post_to_url'])); } 
         elseif ($type === 'redirect' && class_exists('\STSRedirect\Core\RedirectStorage')) {
             $storage = new \STSRedirect\Core\RedirectStorage();
-            $storage->add('/' . sanitize_title($_POST['slug_from']), $post_to_url, 301);
+            $storage->add('/' . sanitize_title($_POST['slug_from']), esc_url_raw($_POST['post_to_url']), 301);
             wp_update_post(['ID' => $post_from, 'post_status' => 'draft']);
         }
         wp_send_json_success();
@@ -403,9 +400,7 @@ class Dashboard {
         $conflicts = []; $slugs_data = [];
         $suffixes = ['receita', 'facil', 'passo-a-passo', 'caseiro', 'fofinho', 'simples', 'rapido'];
         $suffix_pattern = '/-(' . implode('|', $suffixes) . ')$/';
-
         foreach ($posts as $post_id) {
-            if (get_post_meta($post_id, '_sts_seo_canonical', true)) continue;
             $slug = get_post_field('post_name', $post_id);
             $norm = preg_replace($suffix_pattern, '', $slug);
             $norm = preg_replace('/(s|es)$/', '', $norm);
@@ -415,9 +410,8 @@ class Dashboard {
         for ($i = 0; $i < count($ids); $i++) {
             for ($j = $i + 1; $j < count($ids); $j++) {
                 $a = $slugs_data[$ids[$i]]; $b = $slugs_data[$ids[$j]];
-                $is_direct = ($a['norm'] === $b['norm']);
-                if ($is_direct || (strlen($a['norm']) > 5 && strpos($b['norm'], $a['norm']) !== false)) {
-                    $conflicts[] = [ 'keyword' => $a['norm'], 'post1' => $a['slug'], 'post2' => $b['slug'], 'type1' => $a['type'], 'type2' => $b['type'], 'id1' => $a['id'], 'url2' => $b['url'], 'status' => $is_direct ? 'CRÍTICO' : 'ATENÇÃO' ];
+                if ($a['norm'] === $b['norm'] || (strlen($a['norm']) > 5 && strpos($b['norm'], $a['norm']) !== false)) {
+                    $conflicts[] = [ 'keyword' => $a['norm'], 'post1' => $a['slug'], 'post2' => $b['slug'], 'type1' => $a['type'], 'id1' => $a['id'], 'url2' => $b['url'], 'status' => $a['norm']===$b['norm'] ? 'CRÍTICO' : 'ATENÇÃO' ];
                 }
             }
         }
