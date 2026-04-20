@@ -56,17 +56,18 @@ class Dashboard {
     }
 
     public function render_page() {
-        ?>
-        <div class="wrap">
+                <div class="wrap">
             <div class="sts-scout-container">
                 <div class="sts-scout-card card">
+                    <div class="sts-scout-header">
                         <div>
                             <h2><?php _e('SEO Cannibalization Scout', 'seo-cannibalization-scout'); ?></h2>
                             <p><?php _e('Professional URL Conflict and Content Cannibalization Detector.', 'seo-cannibalization-scout'); ?></p>
                         </div>
                         <div class="sts-help-trigger" id="open-help-modal" title="<?php _e('Comparative Summary', 'seo-cannibalization-scout'); ?>">?</div>
                     </div>
-                    <div style="margin-top:20px;">
+                    
+                    <div class="sts-scout-content">
                         <p><strong><?php _e('Select content types to audit:', 'seo-cannibalization-scout'); ?></strong></p>
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
                             <?php
@@ -81,17 +82,17 @@ class Dashboard {
                                 </label>
                             <?php endforeach; ?>
                         </div>
-                    <button type="button" class="button button-primary button-large" id="run-scout-btn">
-                        <?php _e('Start Scan', 'seo-cannibalization-scout'); ?>
-                    </button>
-                    <span class="spinner" id="scout-spinner"></span>
-                </div>
-                    <div id="scout-results" style="margin-top:30px;"></div>
-                </div>
-
-                    <div id="scout-results" style="margin-top:30px;"></div>
+                        
+                        <button type="button" class="button button-primary button-large" id="run-scout-btn">
+                            <?php _e('Start Scan', 'seo-cannibalization-scout'); ?>
+                        </button>
+                        <span class="spinner" id="scout-spinner"></span>
+                        
+                        <div id="scout-results" style="margin-top:30px;"></div>
+                    </div>
                 </div>
             </div>
+v>
 
             <!-- Modal de Ajuda -->
             <div id="sts-help-modal" class="sts-audit-modal">
