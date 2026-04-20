@@ -24,7 +24,7 @@ class Dashboard {
     public function enqueue_assets($hook) {
         if ('toplevel_page_seo-cannibalization-scout' !== $hook) return;
         wp_add_inline_style('wp-admin', "
-            .sts-scout-container { display: grid; grid-template-columns: 1fr 300px; gap: 20px; max-width: 1300px; margin-top: 20px; align-items: start; }
+            .sts-scout-container { display: grid; grid-template-columns: 7fr 3fr; gap: 25px; max-width: 1400px; margin-top: 20px; align-items: start; }
             .sts-scout-card { border-radius: 8px; position:relative; background:#fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccd0d4; overflow:hidden; }
             .sts-scout-header { background: #d63638; color: #fff; padding: 30px; display:flex; justify-content:space-between; align-items:center; }
             .sts-scout-header h2 { color: #fff !important; margin: 0 !important; font-size: 24px; line-height:1.2; }
