@@ -240,6 +240,11 @@ class Dashboard {
                     </div>
 
                     <button id="sts-confirm-resolve-btn" class="sts-resolve-confirm" style="display:none; transition: 0.3s;"><?php _e('EXECUTAR RESOLUÇÃO','seo-cannibalization-scout');?></button>
+                    
+                    <div id="sts-manus-tip" style="margin-top: 20px; padding: 15px; background: #fffaf0; border: 1px solid #fbd38d; border-radius: 8px; display:none;">
+                        <h5 style="margin: 0 0 5px 0; color: #975a16;">💡 Dica do Manus:</h5>
+                        <p id="sts-manus-tip-text" style="margin:0; font-size: 12px; color: #744210;"></p>
+                    </div>
                 </div>
             </div>
 
@@ -333,16 +338,21 @@ class Dashboard {
                                         <div style='background: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0; display:flex; justify-content: space-between; align-items:center;'>
                                             <div>
                                                 <span style='background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;'>Master URL</span>
-                                                <h3 style='margin: 10px 0 5px 0; font-size:18px;'>${group.master.title}</h3>
+                                                 <h3 style='margin: 10px 0 5px 0; font-size:18px;'>${group.master.title}</h3>
                                                 <code style='color:#718096; font-size:12px;'>${group.master.url}</code>
+                                                ${group.master.manus_tip ? `<div style='margin-top:8px; color:#d63638; font-size:11px; font-weight:bold;'>💥 Recomendação: ${group.master.manus_tip}</div>` : ''}
                                             </div>
                                             <div style='text-align:right;'>
                                                 <div class='sts-stat-val' style='font-size:20px;'>${group.master.gsc.clicks}</div>
                                                 <span style='font-size:11px; color:#a0aec0;'>clicks / mês</span>
+                                                <div style='font-size:10px; color:#718096;'>Posição GSC: ${group.master.gsc.position}º</div>
                                             </div>
                                         </div>
                                         <div style='padding: 20px;'>
-                                            <p style='margin: 0 0 15px 0; font-weight: bold; color: #e53e3e; font-size: 13px;'>⚠️ CONFLITOS DETECTADOS NESTE GRUPO:</p>
+                                            <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;'>
+                                                <p style='margin: 0; font-weight: bold; color: #e53e3e; font-size: 13px;'>⚠️ CONFLITOS DETECTADOS NESTE GRUPO:</p>
+                                                <span style='font-size: 11px; background: #fed7d7; color: #9b2c2c; padding: 2px 8px; border-radius: 10px; font-weight: bold;'>Estratégia Manus: ${group.strategy}</span>
+                                            </div>
                                             <div style='display:grid; gap: 10px;'>`;
                                     
                                     group.slaves.forEach((slave, sIndex)=>{
@@ -351,6 +361,7 @@ class Dashboard {
                                                     <span style='font-size: 10px; color: #c53030; font-weight: 800; text-transform: uppercase;'>[${slave.type}]</span>
                                                     <div style='font-weight: 600; margin: 3px 0;'>${slave.title}</div>
                                                     <code style='font-size: 11px; opacity: 0.7;'>${slave.url}</code>
+                                                    ${slave.manus_tip ? `<div style='font-size:10px; color:#9b2c2c; margin-top:4px;'>💡 ${slave.manus_tip}</div>` : ''}
                                                 </div>
                                                 <div style='display:flex; align-items:center; gap: 15px;'>
                                                     <div style='text-align:center;'>
@@ -381,7 +392,15 @@ class Dashboard {
                         post_to_url: group.master.url,
                         btn: $(btnElem)
                     };
+
+                    // Dica contextua do Manus no modal
+                    let tip = "Analise o conteúdo desta URL e incorpore o que for útil na Master antes de executar.";
+                    if (group.strategy === 'Tópico Relacionado (Cluster)') {
+                        tip = "Manus recomenda: Adicione um link interno na Master para esta URL Fit/Vegana para diferenciar a intenção.";
+                    }
                     
+                    $('#sts-manus-tip-text').text(tip);
+                    $('#sts-manus-tip').show();
                     $('#sts-resolve-modal').fadeIn();
                 };
 
@@ -537,13 +556,39 @@ class Dashboard {
             if (count($current_cluster) > 1) {
                 // Eleição da Master (Quem tem mais cliques vence)
                 usort($current_cluster, function($a, $b) {
-                    return ($b['gsc']['clicks'] ?? 0) - ($a['gsc']['clicks'] ?? 0);
+                    return (($b['gsc']['clicks'] ?? 0) * 10) + (100 - ($b['gsc']['position'] ?? 100)) - ((($a['gsc']['clicks'] ?? 0) * 10) + (100 - ($a['gsc']['position'] ?? 100)));
                 });
 
                 $master = array_shift($current_cluster);
+                
+                // INTELIGÊNCIA MANUS: Determinar Estratégia do Grupo
+                $strategy = 'Fusão de Poder (Redir 301)';
+                foreach ($current_cluster as $slave) {
+                    $diff_words = ['fit','vegano','diet','low carb','saudavel','tradicional','fofinho','liquidificador'];
+                    foreach ($diff_words as $w) {
+                        if (strpos(strtolower($slave['title']), $w) !== false && strpos(strtolower($master['title']), $w) === false) {
+                            $strategy = 'Tópico Relacionado (Cluster)';
+                            break;
+                        }
+                    }
+                }
+                
+                // INTELIGÊNCIA MANUS: Dicas da Master
+                if ($master['gsc']['position'] > 10 && strlen($master['slug']) > 40) {
+                    $master['manus_tip'] = "Encurte o Slug para focar no termo principal. Está fora do Top 10.";
+                }
+
+                // INTELIGÊNCIA MANUS: Dicas das Slaves
+                foreach ($current_cluster as &$s) {
+                    if ($s['gsc']['clicks'] == 0) {
+                        $s['manus_tip'] = "Esta URL tem ZERO tração. Delete e faça o 301 sem medo.";
+                    }
+                }
+
                 $groups[] = [
                     'master' => $master,
-                    'slaves' => $current_cluster
+                    'slaves' => $current_cluster,
+                    'strategy' => $strategy
                 ];
             }
         }
