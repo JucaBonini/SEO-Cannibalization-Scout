@@ -60,9 +60,12 @@ class EditorScout {
                     const title = getTitle();
                     const postId = $('#post_ID').val();
                     
-                    if (!title || title.length < 5) return;
+                    if (!title || title.length < 3) {
+                        $('#sts-scout-status').html('Aguardando título para análise...');
+                        return;
+                    }
 
-                    $('#sts-scout-status').css('opacity', 0.5);
+                    $('#sts-scout-status').html('<span class="spinner is-active" style="float:none; margin:0 5px 0 0;"></span> Analisando...').css('opacity', 0.8);
                     
                     $.post(ajaxurl, {
                         action: 'sts_scout_check_cannibal',
@@ -79,17 +82,22 @@ class EditorScout {
                                 html = `<div><span class='sts-scout-pulse sts-pulse-red'></span><strong>ALERTA DE CONFLITO!</strong></div>`;
                                 html += `<div class='sts-conflict-item'>Similaridade: <strong>\${data.similarity}%</strong><br>Com: <a href='\${data.url}' target='_blank'>\${data.title}</a></div>`;
                                 if(data.cpc) html += `<div class='sts-cpc-tag'>💰 CPC Sugerido: \${data.cpc}</div>`;
-                                html += `<p style='font-size:11px; margin-top:10px;'>💡 <em>IA Scout: Este post pode canibalizar sua autoridade. Considere mudar o foco ou usar estratégia de Cluster.</em></p>`;
                             } else {
                                 $('#sts-scout-status').removeClass('sts-scout-danger').addClass('sts-scout-safe');
                                 html = `<div><span class='sts-scout-pulse sts-pulse-green'></span><strong>URL BLINDADA</strong></div>`;
-                                html += `<p style='font-size:11px; margin-top:5px;'>Nenhum conflito detectado. Sua estrutura de autoridade está segura.</p>`;
+                                html += `<p style='font-size:11px; margin-top:5px;'>Estrutura de autoridade segura.</p>`;
                                 if(data.cpc) html += `<div class='sts-cpc-tag'>💰 CPC Estimado: \${data.cpc}</div>`;
                             }
                             $('#sts-scout-status').html(html);
                         }
                     });
                 };
+
+                // Monitor Title Change (Classic)
+                $('#title').on('blur change input', function() {
+                    clearTimeout(scoutTimer);
+                    scoutTimer = setTimeout(checkCannibal, 800);
+                });
 
                 // Monitor Title Change (Gutenberg via Subscribe)
                 if (window.wp && wp.data && wp.data.subscribe) {
@@ -103,14 +111,12 @@ class EditorScout {
                     });
                 }
 
-                // Monitor Title Change (Fallback Input)
-                $(document).on('input', '#title, .editor-post-title__input, .editor-post-title textarea', function() {
-                    clearTimeout(scoutTimer);
-                    scoutTimer = setTimeout(checkCannibal, 1000);
+                // Initial check on load
+                $(window).on('load', function() {
+                    setTimeout(checkCannibal, 1500);
                 });
-                
-                // Initial check
-                setTimeout(checkCannibal, 2000);
+                // Fallback for immediate execution
+                setTimeout(checkCannibal, 500);
             });
         ");
     }
