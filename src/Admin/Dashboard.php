@@ -146,8 +146,10 @@ class Dashboard {
                                 </label>
                             <?php endforeach;?>
                         </div>
-                        <button class="button button-primary button-hero" id="run-audit-action" style="height:45px; padding:0 30px;"><?php _e('Iniciar Varredura','seo-cannibalization-scout');?></button>
-                        <button class="button" id="sync-index-action" style="height:45px; margin-left:10px;"><?php _e('🔄 Reconstruir Índice','seo-cannibalization-scout');?></button>
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="button button-primary button-hero" id="run-audit-action" style="height:45px; padding:0 30px;"><?php _e('Iniciar Varredura','seo-cannibalization-scout');?></button>
+                            <button class="button" id="sync-index-action" style="height:45px; border-color: #d63638; color: #d63638; font-weight: bold;">🔄 Reconstruir Índice de Autoridade</button>
+                        </div>
                         
                         <div id="sts-audit-loader" style="text-align:center; padding:60px; display:none;">
                             <div class="sts-loader-spinner"></div>
