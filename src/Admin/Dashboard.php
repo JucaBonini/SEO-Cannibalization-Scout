@@ -374,27 +374,109 @@ class Dashboard {
         wp_send_json_success(['auth_url'=>$url]);
     }
 
+    /**
+     * Termos irrelevantes que diluem o SEO e causam canibalização falsa
+     */
+    private function get_stop_words() {
+        return [
+            'aprenda-a-fazer','como-fazer','o-melhor','a-melhor','receita-de','receita','facil','simples',
+            'caseiro','economico','rápido','rapido','super','passo-a-passo','dicas','segredo',
+            'perfeito','inesquecível','inesquecivel','delicioso','deliciosa','com','para'
+        ];
+    }
+
+    /**
+     * Normalização profunda para encontrar a intenção de busca real
+     */
+    private function deep_normalize($slug) {
+        $stops = $this->get_stop_words();
+        $slug = str_replace($stops, '', $slug);
+        $slug = preg_replace('/-+/', '-', trim($slug, '-'));
+        // Remove plural básico
+        $slug = preg_replace('/(s|es)$/', '', $slug);
+        return $slug;
+    }
+
     public function ajax_run_audit() {
         check_ajax_referer('cannibal_audit_nonce');
-        $ts = $_POST['types']??['post','page'];
+        $ts = $_POST['types']??['post','page','receita'];
         $ps = get_posts(['post_type'=>$ts,'posts_per_page'=>-1,'post_status'=>'publish','fields'=>'ids']);
         $gsc = $this->get_gsc_performance_data();
-        $conf=[]; $map=[]; $pat='/-(receita|facil|caseiro)$/';
+        
+        $conf = [];
+        $posts_data = [];
+        
+        // Coleta e normaliza todos os posts
         foreach($ps as $pid) {
-             if(get_post_meta($pid,'_sts_seo_canonical',true)) continue;
-             $slug = get_post_field('post_name',$pid); $url=get_permalink($pid);
-             $norm = preg_replace($pat,'',$slug); $norm = preg_replace('/(s|es)$/','',$norm);
-             $map[$norm][] = ['id'=>$pid,'slug'=>$slug,'type'=>get_post_type($pid),'url'=>$url,'gsc'=>$gsc[$url]??['clicks'=>0,'impressions'=>0,'ctr'=>0,'position'=>0]];
+            if(get_post_meta($pid,'_sts_seo_canonical',true)) continue;
+            if(get_post_meta($pid,'_sts_seo_redirect',true)) continue;
+
+            $slug = get_post_field('post_name',$pid);
+            $url = get_permalink($pid);
+            $norm = $this->deep_normalize($slug);
+
+            $posts_data[] = [
+                'id' => $pid,
+                'slug' => $slug,
+                'norm' => $norm,
+                'type' => get_post_type($pid),
+                'url' => $url,
+                'gsc' => $gsc[$url] ?? ['clicks'=>0,'impressions'=>0]
+            ];
         }
-        foreach($map as $k=>$items) {
-             if(count($items)>1) {
-                 usort($items, function($a,$b){ return $b['gsc']['clicks'] - $a['gsc']['clicks']; });
-                 for($i=1;$i<count($items);$i++) {
-                     $conf[] = ['id1'=>$items[$i]['id'],'post1'=>$items[$i]['slug'],'type1'=>$items[$i]['type'],'gsc1'=>$items[$i]['gsc'],'post2'=>$items[0]['slug'],'type2'=>$items[0]['type'],'gsc2'=>$items[0]['gsc'],'url2'=>$items[0]['url']];
-                 }
-             }
+
+        // Comparação Cruzada de Similaridade (MODO GOD)
+        $processed = [];
+        for ($i = 0; $i < count($posts_data); $i++) {
+            if (in_array($i, $processed)) continue;
+            
+            $current_group = [$posts_data[$i]];
+            $processed[] = $i;
+
+            for ($j = $i + 1; $j < count($posts_data); $j++) {
+                if (in_array($j, $processed)) continue;
+
+                // Teste 1: Igualdade após normalização profunda
+                if ($posts_data[$i]['norm'] === $posts_data[$j]['norm']) {
+                    $current_group[] = $posts_data[$j];
+                    $processed[] = $j;
+                    continue;
+                }
+
+                // Teste 2: Similaridade de Levenshtein (Fuzzy Match)
+                $sim = 0;
+                similar_text($posts_data[$i]['norm'], $posts_data[$j]['norm'], $sim);
+                if ($sim > 85) {
+                    $current_group[] = $posts_data[$j];
+                    $processed[] = $j;
+                }
+            }
+
+            if (count($current_group) > 1) {
+                // Ordena por performance (Master é quem tem mais cliques)
+                usort($current_group, function($a, $b) {
+                    return ($b['gsc']['clicks'] ?? 0) - ($a['gsc']['clicks'] ?? 0);
+                });
+
+                $master = $current_group[0];
+                for ($k = 1; $k < count($current_group); $k++) {
+                    $slave = $current_group[$k];
+                    $conf[] = [
+                        'id1' => $slave['id'],
+                        'post1' => $slave['slug'],
+                        'type1' => $slave['type'],
+                        'gsc1' => $slave['gsc'],
+                        'id2' => $master['id'], // Adicionado ID da master para facilitar a resolução
+                        'post2' => $master['slug'],
+                        'type2' => $master['type'],
+                        'gsc2' => $master['gsc'],
+                        'url2' => $master['url']
+                    ];
+                }
+            }
         }
-        wp_send_json_success(['total_posts'=>count($ps),'conflicts'=>$conf]);
+
+        wp_send_json_success(['total_posts'=>count($ps), 'conflicts'=>$conf]);
     }
 
     public function ajax_resolve_issue() {
@@ -409,15 +491,16 @@ class Dashboard {
         }
 
         if ($type === 'redirect') {
-            // Modo Aniquilação (301)
             update_post_meta($post_from, '_sts_seo_redirect', $post_to_url);
-            delete_post_meta($post_from, '_sts_seo_canonical'); // Remove canonical para não conflitar
+            delete_post_meta($post_from, '_sts_seo_canonical');
+            // Opcional: Mudar status para draft ou manter publish? 
+            // Recomendado manter publish para o 301 funcionar melhor com indexação
         } else {
-            // Modo Autoridade (Canonical)
             update_post_meta($post_from, '_sts_seo_canonical', $post_to_url);
-            delete_post_meta($post_from, '_sts_seo_redirect'); // Remove redirect se houver
+            delete_post_meta($post_from, '_sts_seo_redirect');
         }
 
         wp_send_json_success();
     }
+
 }

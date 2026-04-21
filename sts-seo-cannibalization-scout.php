@@ -2,8 +2,8 @@
 /**
  * Plugin Name: SEO Cannibalization Scout
  * Plugin URI: https://descomplicandoreceitas.com.br
- * Description: Auditoria avançada de canibalização de conteúdo e conflitos de URLs para WordPress. Detecte e organize sua autoridade de pesquisa.
- * Version: 2.0.0
+ * Description: [GOD MODE ENABLED] Auditoria Cirúrgica e Execução de Redirecionamento 301 para aniquilar a canibalização de conteúdo.
+ * Version: 3.0.0
  * Author: Juca Souza Bonini
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,6 +23,11 @@ spl_autoload_register(function ($class) {
 add_action('plugins_loaded', function() {
     load_plugin_textdomain('seo-cannibalization-scout', false, dirname(plugin_basename(__FILE__)) . '/languages');
     
+    // Motor de Execução (Frontend)
+    if (!is_admin()) {
+        new \STSCannibal\Engine\Redirector();
+    }
+
     if (is_admin()) {
         new \STSCannibal\Admin\Dashboard();
     }
