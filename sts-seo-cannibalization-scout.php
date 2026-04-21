@@ -3,7 +3,7 @@
  * Plugin Name: SEO Cannibalization Scout
  * Plugin URI: https://descomplicandoreceitas.com.br
  * Description: [GOD MODE ENABLED] Auditoria Cirúrgica e Execução de Redirecionamento 301 para aniquilar a canibalização de conteúdo.
- * Version: 3.0.0
+ * Version: 3.2.0 [MANUS EDITION]
  * Author: Juca Souza Bonini
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
