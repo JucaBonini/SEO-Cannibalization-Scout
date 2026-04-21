@@ -42,17 +42,17 @@ class EditorScout {
             .sts-cpc-tag { display:inline-block; background:#2d3748; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; margin-top:5px; }
         ");
 
-        wp_add_inline_script('wp-admin', "
+        $nonce = wp_create_nonce('sts_scout_nonce');
+        
+        $js = <<<JS
             jQuery(document).ready(function($) {
                 let scoutTimer;
                 
                 const getTitle = () => {
-                    // Tenta Gutenberg primeiro (Mais estável via Data API)
                     if (window.wp && wp.data && wp.data.select('core/editor')) {
                         const title = wp.data.select('core/editor').getEditedPostAttribute('title');
                         if (title) return title;
                     }
-                    // Fallback para Clássico ou campos genéricos
                     return $('#title').val() || $('.editor-post-title__input').text() || $('.editor-post-title textarea').val() || '';
                 };
 
@@ -71,7 +71,7 @@ class EditorScout {
                         action: 'sts_scout_check_cannibal',
                         title: title,
                         post_id: postId,
-                        _ajax_nonce: '" . wp_create_nonce('sts_scout_nonce') . "'
+                        _ajax_nonce: '{$nonce}'
                     }, function(res) {
                         $('#sts-scout-status').css('opacity', 1);
                         if (res.success) {
@@ -93,13 +93,11 @@ class EditorScout {
                     });
                 };
 
-                // Monitor Title Change (Classic)
                 $('#title').on('blur change input', function() {
                     clearTimeout(scoutTimer);
                     scoutTimer = setTimeout(checkCannibal, 800);
                 });
 
-                // Monitor Title Change (Gutenberg via Subscribe)
                 if (window.wp && wp.data && wp.data.subscribe) {
                     wp.data.subscribe(() => {
                         const newTitle = getTitle();
@@ -111,14 +109,13 @@ class EditorScout {
                     });
                 }
 
-                // Initial check on load
                 $(window).on('load', function() {
                     setTimeout(checkCannibal, 1500);
                 });
-                // Fallback for immediate execution
                 setTimeout(checkCannibal, 500);
             });
-        ");
+JS;
+        wp_add_inline_script('wp-admin', $js);
     }
 
     public function render_meta_box($post) {
@@ -136,7 +133,6 @@ class EditorScout {
         global $wpdb;
         $table_name = Database::get_table_name();
         
-        // Busca candidatos no índice (mais rápido que wp_posts)
         $candidates = $wpdb->get_results("SELECT post_id, norm_title FROM $table_name WHERE post_id != $current_post_id");
         
         $best_match = null;
@@ -150,9 +146,8 @@ class EditorScout {
             }
         }
 
-        // Simulação de CPC via IA (Baseado em keywords caras no nicho de receitas)
         $cpc_keywords = ['premium'=>'$0.85', 'gourmet'=>'$0.62', 'fit'=>'$0.45', 'vegano'=>'$0.55', 'saudavel'=>'$0.40', 'facil'=>'$0.12'];
-        $estimated_cpc = '$0.08'; // Default
+        $estimated_cpc = '$0.08';
         foreach($cpc_keywords as $k => $v) {
             if (stripos($title, $k) !== false) { $estimated_cpc = $v; break; }
         }
