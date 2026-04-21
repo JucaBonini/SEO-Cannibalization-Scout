@@ -30,7 +30,8 @@ add_action('plugins_loaded', function() {
 
     if (is_admin()) {
         new \STSCannibal\Admin\Dashboard();
-        // Verificador de Updates via GitHub
-        new \STSCannibal\Engine\Updater('sts-seo-cannibalization-scout', '3.0.0', 'JucaBonini/SEO-Cannibalization-Scout');
+        // Verificador de Updates via GitHub (Dinâmico)
+        $plugin_data = get_file_data(__FILE__, array('Version' => 'Version'), 'plugin');
+        new \STSCannibal\Engine\Updater('sts-seo-cannibalization-scout', $plugin_data['Version'], 'JucaBonini/SEO-Cannibalization-Scout');
     }
 });
