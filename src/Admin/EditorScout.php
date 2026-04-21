@@ -115,7 +115,7 @@ class EditorScout {
                 setTimeout(checkCannibal, 500);
             });
 JS;
-        wp_add_inline_script('wp-admin', $js);
+        wp_add_inline_script('jquery', $js);
     }
 
     public function render_meta_box($post) {
