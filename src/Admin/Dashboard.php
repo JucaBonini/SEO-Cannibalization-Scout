@@ -455,42 +455,6 @@ class Dashboard {
         wp_send_json_success(['auth_url'=>$url]);
     }
 
-    /**
-     * Termos irrelevantes que diluem o SEO e causam canibalização falsa
-     */
-    private function get_stop_words() {
-        return [
-            'aprenda-a-fazer','como-fazer','o-melhor','a-melhor','receita-de','receita','facil','simples',
-            'caseiro','economico','rápido','rapido','super','passo-a-passo','dicas','segredo',
-            'perfeito','inesquecível','inesquecivel','delicioso','deliciosa','com','para'
-        ];
-    }
-
-    /**
-     * Normalização profunda para encontrar a intenção de busca real
-     */
-    private function deep_normalize($text) {
-        $stops = $this->get_stop_words();
-        // Converte para minusculo e remove acentos
-        $text = mb_strtolower($text, 'UTF-8');
-        $text = str_replace(
-            ['á','à','â','ã','ä','é','è','ê','ë','í','ì','î','ï','ó','ò','ô','õ','ö','ú','ù','û','ü','ç','-','_'],
-            ['a','a','a','a','a','e','e','e','e','i','i','i','i','o','o','o','o','o','u','u','u','u','c',' ',' '],
-            $text
-        );
-        
-        // Remove anos e numerais comuns
-        $text = preg_replace('/[0-9]+/', '', $text);
-        
-        // Remove stop words
-        foreach($stops as $stop) {
-            $text = preg_replace('/\b'.preg_quote($stop, '/').'\b/', '', $text);
-        }
-        
-        // Limpeza final de espaços canônicos
-        $text = preg_replace('/\s+/', ' ', trim($text));
-        return $text;
-    }
 
     public function ajax_run_audit() {
         check_ajax_referer('cannibal_audit_nonce');
@@ -508,9 +472,9 @@ class Dashboard {
             $title = get_the_title($pid);
             $url = get_permalink($pid);
             
-            // Normalização por Slug e por Título (Inteligência Híbrida)
-            $norm_slug = $this->deep_normalize($slug);
-            $norm_title = $this->deep_normalize($title);
+            // Normalização por Slug e por Título (Inteligência Híbrida via Core)
+            $norm_slug = \STSCannibal\Core\DeepAnalyzer::normalize($slug);
+            $norm_title = \STSCannibal\Core\DeepAnalyzer::normalize($title);
 
             $posts_data[] = [
                 'id' => $pid,

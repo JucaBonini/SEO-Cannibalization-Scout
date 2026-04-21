@@ -3,7 +3,7 @@
  * Plugin Name: SEO Cannibalization Scout IA
  * Plugin URI: https://descomplicandoreceitas.com.br
  * Description: [GOD MODE ENABLED] Auditoria Cirúrgica, Estratégia de Topic Clusters e Execução de Redirecionamento 301.
- * Version: 3.3.0 [CLUSTER ENGINE]
+ * Version: 3.4.0 [GOD MODE EDITOR]
  * Author: Juca Souza Bonini
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -30,8 +30,23 @@ add_action('plugins_loaded', function() {
 
     if (is_admin()) {
         new \STSCannibal\Admin\Dashboard();
+        new \STSCannibal\Admin\EditorScout();
+        
         // Verificador de Updates via GitHub (Dinâmico)
         $plugin_data = get_file_data(__FILE__, array('Version' => 'Version'), 'plugin');
         new \STSCannibal\Engine\Updater('sts-seo-cannibalization-scout', $plugin_data['Version'], 'JucaBonini/SEO-Cannibalization-Scout');
     }
+});
+
+// Fase 1 & 2: Infraestrutura de Dados (God Mode)
+register_activation_hook(__FILE__, ['\STSCannibal\Core\Database', 'create_table']);
+
+// Sincronização Automática do Índice
+add_action('save_post', function($post_id, $post, $update) {
+    if (wp_is_post_revision($post_id) || $post->post_status !== 'publish') return;
+    \STSCannibal\Core\Database::update_index($post_id);
+}, 10, 3);
+
+add_action('before_delete_post', function($post_id) {
+    \STSCannibal\Core\Database::delete_from_index($post_id);
 });
