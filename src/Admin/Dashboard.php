@@ -311,15 +311,6 @@ class Dashboard {
                 };
 
                 $('.sts-choice-card').on('click', function() {
-                    $('.sts-choice-card').removeClass('active');
-                    $(this).addClass('active');
-                    $('#sts-confirm-resolve-btn').data('type', $(this).data('type')).fadeIn();
-                });
-
-                $('#sts-confirm-resolve-btn').on('click', function() {
-                    window.stsExecuteResolution($(this).data('type'));
-                });
-
                 $('#run-audit-action').on('click', function() {
                     const btn=$(this); const loader=$('#sts-audit-loader'); const res_div=$('#sts-audit-results');
                     const types=$('input[name="post_types[]"]:checked').map(function(){return $(this).val();}).get();
@@ -382,29 +373,25 @@ class Dashboard {
                     });
                 });
 
-                // NOVO: Handler para as escolhas (Canonical/Redirect)
                 $(document).on('click', '.sts-choice-card', function() {
                     $('.sts-choice-card').removeClass('active');
                     $(this).addClass('active');
-                    $('#sts-confirm-resolve-btn').data('type', $(this).data('type')).fadeIn();
+                    $('#sts-confirm-resolve-btn').data('type', $(this).data('type')).css('display', 'block');
                 });
                 
                 window.stsResolveConflictGroup = function(gIndex, sIndex, btnElem) {
                     const group = window.scout_groups[gIndex];
                     const slave = group.slaves[sIndex];
                     
-                    // Limpa seleções anteriores
                     $('.sts-choice-card').removeClass('active');
                     $('#sts-confirm-resolve-btn').hide();
 
-                    // Prepara os dados para o modal de resolução
                     window.sts_current_res = {
                         post_from: slave.id,
                         post_to_url: group.master.url,
                         btn: $(btnElem)
                     };
 
-                    // Dica contextual da IA no modal
                     let tip = "Analise o conteúdo desta URL e incorpore o que for útil na Master antes de executar.";
                     if (group.strategy === 'Tópico Relacionado (Cluster)') {
                         tip = "A IA recomenda: Adicione um link interno na Master para esta URL Fit/Vegana para diferenciar a intenção.";
