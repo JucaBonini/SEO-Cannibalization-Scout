@@ -242,8 +242,11 @@ class Dashboard {
                     <button id="sts-confirm-resolve-btn" class="sts-resolve-confirm" style="display:none; transition: 0.3s;"><?php _e('EXECUTAR RESOLUÇÃO','seo-cannibalization-scout');?></button>
                     
                     <div id="sts-ai-tip" style="margin-top: 20px; padding: 15px; background: #fffaf0; border: 1px solid #fbd38d; border-radius: 8px; display:none;">
-                        <h5 style="margin: 0 0 5px 0; color: #975a16;">💡 Dica da SEO Cannibalization Scout IA:</h5>
+                        <h5 style="margin: 0 0 5px 0; color: #975a16;">🧠 Estratégia da SEO Cannibalization Scout IA:</h5>
                         <p id="sts-ai-tip-text" style="margin:0; font-size: 12px; color: #744210;"></p>
+                        <div id="sts-ai-anchor-box" style="margin-top:10px; padding:8px; background:#fff; border:1px dashed #f6ad55; font-size:11px; display:none;">
+                            <strong>Âncora Recomendada:</strong> <span id="sts-ai-anchor-text" style="color:#c53030; font-weight:bold;"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -328,10 +331,10 @@ class Dashboard {
                                     h+=`<div class='sts-conflict-card' style='display:block; border-left: 10px solid #d63638; padding: 0;'>
                                         <div style='background: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0; display:flex; justify-content: space-between; align-items:center;'>
                                             <div>
-                                                <span style='background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;'>Master URL</span>
+                                                <span style='background:#2d3748; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;'>Página Pilar (Master)</span>
                                                  <h3 style='margin: 10px 0 5px 0; font-size:18px;'>${group.master.title}</h3>
                                                 <code style='color:#718096; font-size:12px;'>${group.master.url}</code>
-                                                ${group.master.ai_tip ? `<div style='margin-top:8px; color:#d63638; font-size:11px; font-weight:bold;'>💥 Recomendação: ${group.master.ai_tip}</div>` : ''}
+                                                ${group.master.ai_tip ? `<div style='margin-top:8px; color:#c53030; font-size:11px; font-weight:bold;'>💥 Alerta IA: ${group.master.ai_tip}</div>` : ''}
                                             </div>
                                             <div style='text-align:right;'>
                                                 <div class='sts-stat-val' style='font-size:20px;'>${group.master.gsc.clicks}</div>
@@ -341,8 +344,8 @@ class Dashboard {
                                         </div>
                                         <div style='padding: 20px;'>
                                             <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;'>
-                                                <p style='margin: 0; font-weight: bold; color: #e53e3e; font-size: 13px;'>⚠️ CONFLITOS DETECTADOS NESTE GRUPO:</p>
-                                                <span style='font-size: 11px; background: #fed7d7; color: #9b2c2c; padding: 2px 8px; border-radius: 10px; font-weight: bold;'>Estratégia IA: ${group.strategy}</span>
+                                                <p style='margin: 0; font-weight: bold; color: #4a5568; font-size: 13px;'>📡 PÁGINAS SATÉLITE (CLUSTERS):</p>
+                                                <span style='font-size: 11px; background: #e2e8f0; color: #2d3748; padding: 2px 8px; border-radius: 10px; font-weight: bold;'>Estratégia: ${group.strategy}</span>
                                             </div>
                                             <div style='display:grid; gap: 10px;'>`;
                                     
@@ -385,16 +388,20 @@ class Dashboard {
                     
                     $('.sts-choice-card').removeClass('active');
                     $('#sts-confirm-resolve-btn').hide();
+                    $('#sts-ai-anchor-box').hide();
 
                     window.sts_current_res = {
                         post_from: slave.id,
                         post_to_url: group.master.url,
                         btn: $(btnElem)
                     };
-
-                    let tip = "Analise o conteúdo desta URL e incorpore o que for útil na Master antes de executar.";
+                    
+                    // Dica contextual da IA no modal
+                    let tip = "Analise o conteúdo desta URL e incorpore o que for útil na Página Pilar antes de executar o redirecionamento.";
                     if (group.strategy === 'Tópico Relacionado (Cluster)') {
-                        tip = "A IA recomenda: Adicione um link interno na Master para esta URL Fit/Vegana para diferenciar a intenção.";
+                        tip = "Estratégia Pillar-Satellite: Mantenha as duas URLs! Para resolver, adicione um link interno nesta Página Satélite apontando para a Pilar usando a âncora abaixo.";
+                        $('#sts-ai-anchor-text').text(group.master.title);
+                        $('#sts-ai-anchor-box').show();
                     }
                     
                     $('#sts-ai-tip-text').text(tip);
