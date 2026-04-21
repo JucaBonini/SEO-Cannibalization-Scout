@@ -45,8 +45,19 @@ class EditorScout {
         wp_add_inline_script('wp-admin', "
             jQuery(document).ready(function($) {
                 let scoutTimer;
+                
+                const getTitle = () => {
+                    // Tenta Gutenberg primeiro (Mais estável via Data API)
+                    if (window.wp && wp.data && wp.data.select('core/editor')) {
+                        const title = wp.data.select('core/editor').getEditedPostAttribute('title');
+                        if (title) return title;
+                    }
+                    // Fallback para Clássico ou campos genéricos
+                    return $('#title').val() || $('.editor-post-title__input').text() || $('.editor-post-title textarea').val() || '';
+                };
+
                 const checkCannibal = () => {
-                    const title = $('#title').val() || $('.editor-post-title__input').text();
+                    const title = getTitle();
                     const postId = $('#post_ID').val();
                     
                     if (!title || title.length < 5) return;
@@ -80,8 +91,20 @@ class EditorScout {
                     });
                 };
 
-                // Monitor Title Change
-                $(document).on('input', '#title, .editor-post-title__input', function() {
+                // Monitor Title Change (Gutenberg via Subscribe)
+                if (window.wp && wp.data && wp.data.subscribe) {
+                    wp.data.subscribe(() => {
+                        const newTitle = getTitle();
+                        if (newTitle && newTitle !== window.sts_last_title) {
+                            window.sts_last_title = newTitle;
+                            clearTimeout(scoutTimer);
+                            scoutTimer = setTimeout(checkCannibal, 1200);
+                        }
+                    });
+                }
+
+                // Monitor Title Change (Fallback Input)
+                $(document).on('input', '#title, .editor-post-title__input, .editor-post-title textarea', function() {
                     clearTimeout(scoutTimer);
                     scoutTimer = setTimeout(checkCannibal, 1000);
                 });

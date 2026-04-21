@@ -6,6 +6,7 @@ class Dashboard {
         add_action('admin_menu', [$this, 'add_menu_page']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_sts_cannibal_run_audit', [$this, 'ajax_run_audit']);
+        add_action('wp_ajax_sts_cannibal_sync_index', [$this, 'ajax_sync_index']);
         add_action('wp_ajax_sts_cannibal_resolve_issue', [$this, 'ajax_resolve_issue']);
         add_action('wp_ajax_sts_cannibal_save_lang', [$this, 'ajax_save_lang']);
         add_action('wp_ajax_sts_cannibal_save_gsc', [$this, 'ajax_save_gsc']);
@@ -146,6 +147,7 @@ class Dashboard {
                             <?php endforeach;?>
                         </div>
                         <button class="button button-primary button-hero" id="run-audit-action" style="height:45px; padding:0 30px;"><?php _e('Iniciar Varredura','seo-cannibalization-scout');?></button>
+                        <button class="button" id="sync-index-action" style="height:45px; margin-left:10px;"><?php _e('🔄 Reconstruir Índice','seo-cannibalization-scout');?></button>
                         
                         <div id="sts-audit-loader" style="text-align:center; padding:60px; display:none;">
                             <div class="sts-loader-spinner"></div>
@@ -436,6 +438,18 @@ class Dashboard {
                         }
                     });
                 });
+                $('#sync-index-action').on('click', function() {
+                    const btn = $(this);
+                    btn.prop('disabled', true).text('⌛ Sincronizando...');
+                    $.post(ajaxurl, {
+                        action: 'sts_cannibal_sync_index',
+                        _ajax_nonce: '<?php echo wp_create_nonce("cannibal_audit_nonce"); ?>'
+                    }, function(res) {
+                        btn.prop('disabled', false).text('✅ Índice Atualizado!');
+                        setTimeout(() => { btn.text('🔄 Reconstruir Índice'); }, 3000);
+                        if (res.success) alert('Sucesso! ' + res.data.count + ' posts foram indexados.');
+                    });
+                });
             });
             </script>
         </div>
@@ -563,6 +577,19 @@ class Dashboard {
         }
 
         wp_send_json_success(['total_posts'=>count($ps), 'groups'=>$groups]);
+    }
+
+    public function ajax_sync_index() {
+        check_ajax_referer('cannibal_audit_nonce');
+        global $wpdb;
+        $table_name = \STSCannibal\Core\Database::get_table_name();
+        $wpdb->query("TRUNCATE TABLE $table_name");
+        
+        $ps = get_posts(['post_type'=>['post','page','receita','web-story'],'posts_per_page'=>-1,'post_status'=>'publish','fields'=>'ids']);
+        foreach($ps as $pid) {
+            \STSCannibal\Core\Database::update_index($pid);
+        }
+        wp_send_json_success(['count'=>count($ps)]);
     }
 
     public function ajax_resolve_issue() {
