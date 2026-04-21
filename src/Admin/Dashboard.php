@@ -101,12 +101,12 @@ class Dashboard {
             'analyzing' => __('Analyzing Content Ecosystem...','seo-cannibalization-scout'),
             'scanning' => __('SURGICAL SCANNING...','seo-cannibalization-scout'),
             'analyzed_label' => __('Items','seo-cannibalization-scout'),
-            'conflicts_label' => __('Conflicts Found','seo-cannibalization-scout'),
+            'conflicts_label' => __('Clusters Found','seo-cannibalization-scout'),
             'clicks_label' => __('clicks','seo-cannibalization-scout'),
             'views_label' => __('views','seo-cannibalization-scout'),
             'impress_label' => __('impressions','seo-cannibalization-scout'),
-            'resolve_btn' => __('Resolve','seo-cannibalization-scout'),
-            'start_action' => __('Iniciar Varredura','seo-cannibalization-scout'),
+            'resolve_btn' => __('Resolve Group','seo-cannibalization-scout'),
+            'start_action' => __('Iniciar Varredura God Mode','seo-cannibalization-scout'),
         ];
         ?>
         <div class="wrap" style="max-width:1300px; margin:20px auto;">
@@ -327,32 +327,89 @@ class Dashboard {
                         btn.prop('disabled',false).html('🚀 ' + sts_i18n.start_action);
                         loader.fadeOut(function(){
                             if(res.success){
-                                let h=`<div style='display:flex;gap:20px;margin-bottom:30px;'><div class='sts-stat-card'><span class='sts-stat-val'>${res.data.total_posts}</span> ${sts_i18n.analyzed_label}</div><div class='sts-stat-card'><span class='sts-stat-val'>${res.data.conflicts.length}</span> ${sts_i18n.conflicts_label}</div></div>`;
-                                res.data.conflicts.forEach((item,index)=>{
-                                    h+=`<div class='sts-conflict-card' id='conflict-${index}'>
-                                        <div class='sts-duel-grid'>
-                                            <div class='sts-url-box' style='${item.gsc1.clicks < item.gsc2.clicks ? 'opacity:0.6' : 'border:2px solid #d63638; box-shadow: 0 0 10px rgba(214, 54, 56, 0.1);'}'>
-                                                <span class='sts-badge' style='background:#e2e8f0; color:#4a5568; font-size:9px; padding:2px 6px; border-radius:4px; text-transform:uppercase;'>${item.type1}</span><br><strong>/${item.post1}/</strong>
-                                                <div class='sts-metrics-row'>
-                                                    <div class='sts-metric-tag' title='Cliques no último mês'>🖱️ ${item.gsc1.clicks}</div>
-                                                    <div class='sts-metric-tag' title='Impressões no Search Console'>👁️ ${item.gsc1.impressions}</div>
-                                                </div>
+                                let h=`<div style='display:flex;gap:20px;margin-bottom:30px;'><div class='sts-stat-card'><span class='sts-stat-val'>${res.data.total_posts}</span> ${sts_i18n.analyzed_label}</div><div class='sts-stat-card'><span class='sts-stat-val'>${res.data.groups.length}</span> ${sts_i18n.conflicts_label}</div></div>`;
+                                res.data.groups.forEach((group, gIndex)=>{
+                                    h+=`<div class='sts-conflict-card' style='display:block; border-left: 10px solid #d63638; padding: 0;'>
+                                        <div style='background: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0; display:flex; justify-content: space-between; align-items:center;'>
+                                            <div>
+                                                <span style='background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;'>Master URL</span>
+                                                <h3 style='margin: 10px 0 5px 0; font-size:18px;'>${group.master.title}</h3>
+                                                <code style='color:#718096; font-size:12px;'>${group.master.url}</code>
                                             </div>
-                                            <div class='sts-vs-circle' style='box-shadow: 0 4px 10px rgba(214, 54, 56, 0.3);'>VS</div>
-                                            <div class='sts-url-box' style='${item.gsc2.clicks < item.gsc1.clicks ? 'opacity:0.6' : 'border:2px solid #d63638; box-shadow: 0 0 10px rgba(214, 54, 56, 0.1);'}'>
-                                                <span class='sts-badge' style='background:#e2e8f0; color:#4a5568; font-size:9px; padding:2px 6px; border-radius:4px; text-transform:uppercase;'>${item.type2}</span><br><strong>/${item.post2}/</strong>
-                                                <div class='sts-metrics-row'>
-                                                    <div class='sts-metric-tag'>🖱️ ${item.gsc2.clicks}</div>
-                                                    <div class='sts-metric-tag'>👁️ ${item.gsc2.impressions}</div>
-                                                </div>
+                                            <div style='text-align:right;'>
+                                                <div class='sts-stat-val' style='font-size:20px;'>${group.master.gsc.clicks}</div>
+                                                <span style='font-size:11px; color:#a0aec0;'>clicks / mês</span>
                                             </div>
                                         </div>
-                                        <button class='button button-primary' onclick='stsResolveConflict(${index}, this)' style='margin-left:20px; font-weight:700;'>${sts_i18n.resolve_btn}</button>
-                                    </div>`;
+                                        <div style='padding: 20px;'>
+                                            <p style='margin: 0 0 15px 0; font-weight: bold; color: #e53e3e; font-size: 13px;'>⚠️ CONFLITOS DETECTADOS NESTE GRUPO:</p>
+                                            <div style='display:grid; gap: 10px;'>`;
+                                    
+                                    group.slaves.forEach((slave, sIndex)=>{
+                                        h+=`<div style='background: #fff5f5; border: 1px solid #feb2b2; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;'>
+                                                <div style='flex: 1;'>
+                                                    <span style='font-size: 10px; color: #c53030; font-weight: 800; text-transform: uppercase;'>[${slave.type}]</span>
+                                                    <div style='font-weight: 600; margin: 3px 0;'>${slave.title}</div>
+                                                    <code style='font-size: 11px; opacity: 0.7;'>${slave.url}</code>
+                                                </div>
+                                                <div style='display:flex; align-items:center; gap: 15px;'>
+                                                    <div style='text-align:center;'>
+                                                        <span style='display:block; font-weight:800; color:#c53030;'>${slave.gsc.clicks}</span>
+                                                        <span style='font-size:10px;'>clicks</span>
+                                                    </div>
+                                                    <button class='button button-small' onclick="stsResolveConflictGroup(${gIndex}, ${sIndex}, this)" style='border-color: #f56565; color: #c53030;'>Resolv</button>
+                                                </div>
+                                            </div>`;
+                                    });
+                                    
+                                    h+=`</div></div></div>`;
                                 });
-                                res_div.html(h).fadeIn(); window.scout_conflicts=res.data.conflicts;
+                                res_div.html(h).fadeIn(); 
+                                window.scout_groups = res.data.groups;
                             }
                         });
+                    });
+                });
+                
+                window.stsResolveConflictGroup = function(gIndex, sIndex, btnElem) {
+                    const group = window.scout_groups[gIndex];
+                    const slave = group.slaves[sIndex];
+                    
+                    // Prepara os dados para o modal de resolução
+                    window.sts_current_res = {
+                        post_from: slave.id,
+                        post_to_url: group.master.url,
+                        btn: $(btnElem)
+                    };
+                    
+                    $('#sts-resolve-modal').fadeIn();
+                };
+
+                $('#sts-confirm-resolve-btn').on('click', function() {
+                    const $resolveBtn = $(this);
+                    const type = $resolveBtn.data('type');
+                    const data = window.sts_current_res;
+                    
+                    $resolveBtn.prop('disabled', true).html('<span class="spinner is-active" style="float:none;"></span> Executando...');
+
+                    $.post(ajaxurl, {
+                        action: 'sts_cannibal_resolve_issue',
+                        _ajax_nonce: '<?php echo wp_create_nonce("cannibal_resolve_nonce"); ?>',
+                        post_from: data.post_from,
+                        post_to_url: data.post_to_url,
+                        resolve_type: type
+                    }, function(res) {
+                        $('#sts-resolve-modal').fadeOut();
+                        $resolveBtn.prop('disabled', false).text('EXECUTAR RESOLUÇÃO');
+                        
+                        if (res.success) {
+                            data.btn.closest('div[style*="background: #fff5f5"]').fadeOut(800, function() { 
+                                $(this).remove(); 
+                                // Se o grupo ficar vazio, remove o card do grupo
+                            });
+                        } else {
+                            alert('Erro: ' + (res.data || 'Falha.'));
+                        }
                     });
                 });
             });
@@ -388,95 +445,110 @@ class Dashboard {
     /**
      * Normalização profunda para encontrar a intenção de busca real
      */
-    private function deep_normalize($slug) {
+    private function deep_normalize($text) {
         $stops = $this->get_stop_words();
-        $slug = str_replace($stops, '', $slug);
-        $slug = preg_replace('/-+/', '-', trim($slug, '-'));
-        // Remove plural básico
-        $slug = preg_replace('/(s|es)$/', '', $slug);
-        return $slug;
+        // Converte para minusculo e remove acentos
+        $text = mb_strtolower($text, 'UTF-8');
+        $text = str_replace(
+            ['á','à','â','ã','ä','é','è','ê','ë','í','ì','î','ï','ó','ò','ô','õ','ö','ú','ù','û','ü','ç','-','_'],
+            ['a','a','a','a','a','e','e','e','e','i','i','i','i','o','o','o','o','o','u','u','u','u','c',' ',' '],
+            $text
+        );
+        
+        // Remove anos e numerais comuns
+        $text = preg_replace('/[0-9]+/', '', $text);
+        
+        // Remove stop words
+        foreach($stops as $stop) {
+            $text = preg_replace('/\b'.preg_quote($stop, '/').'\b/', '', $text);
+        }
+        
+        // Limpeza final de espaços canônicos
+        $text = preg_replace('/\s+/', ' ', trim($text));
+        return $text;
     }
 
     public function ajax_run_audit() {
         check_ajax_referer('cannibal_audit_nonce');
-        $ts = $_POST['types']??['post','page','receita'];
+        $ts = $_POST['types']??['post','page','receita','web-story'];
         $ps = get_posts(['post_type'=>$ts,'posts_per_page'=>-1,'post_status'=>'publish','fields'=>'ids']);
         $gsc = $this->get_gsc_performance_data();
         
-        $conf = [];
         $posts_data = [];
         
-        // Coleta e normaliza todos os posts
         foreach($ps as $pid) {
             if(get_post_meta($pid,'_sts_seo_canonical',true)) continue;
             if(get_post_meta($pid,'_sts_seo_redirect',true)) continue;
 
             $slug = get_post_field('post_name',$pid);
+            $title = get_the_title($pid);
             $url = get_permalink($pid);
-            $norm = $this->deep_normalize($slug);
+            
+            // Normalização por Slug e por Título (Inteligência Híbrida)
+            $norm_slug = $this->deep_normalize($slug);
+            $norm_title = $this->deep_normalize($title);
 
             $posts_data[] = [
                 'id' => $pid,
+                'title' => $title,
                 'slug' => $slug,
-                'norm' => $norm,
+                'norm_slug' => $norm_slug,
+                'norm_title' => $norm_title,
                 'type' => get_post_type($pid),
                 'url' => $url,
                 'gsc' => $gsc[$url] ?? ['clicks'=>0,'impressions'=>0]
             ];
         }
 
-        // Comparação Cruzada de Similaridade (MODO GOD)
+        $groups = [];
         $processed = [];
+        
         for ($i = 0; $i < count($posts_data); $i++) {
             if (in_array($i, $processed)) continue;
             
-            $current_group = [$posts_data[$i]];
+            $current_cluster = [$posts_data[$i]];
             $processed[] = $i;
 
             for ($j = $i + 1; $j < count($posts_data); $j++) {
                 if (in_array($j, $processed)) continue;
 
-                // Teste 1: Igualdade após normalização profunda
-                if ($posts_data[$i]['norm'] === $posts_data[$j]['norm']) {
-                    $current_group[] = $posts_data[$j];
-                    $processed[] = $j;
-                    continue;
+                $is_cannibal = false;
+                
+                // Teste 1: Títulos idênticos ou quase idênticos (Sinal Forte)
+                if ($posts_data[$i]['norm_title'] === $posts_data[$j]['norm_title']) {
+                    $is_cannibal = true;
+                } else {
+                    similar_text($posts_data[$i]['norm_title'], $posts_data[$j]['norm_title'], $sim_title);
+                    if ($sim_title > 88) $is_cannibal = true;
                 }
 
-                // Teste 2: Similaridade de Levenshtein (Fuzzy Match)
-                $sim = 0;
-                similar_text($posts_data[$i]['norm'], $posts_data[$j]['norm'], $sim);
-                if ($sim > 85) {
-                    $current_group[] = $posts_data[$j];
+                // Teste 2: Slugs similares (Sinal Secundário)
+                if (!$is_cannibal) {
+                    similar_text($posts_data[$i]['norm_slug'], $posts_data[$j]['norm_slug'], $sim_slug);
+                    if ($sim_slug > 92) $is_cannibal = true;
+                }
+
+                if ($is_cannibal) {
+                    $current_cluster[] = $posts_data[$j];
                     $processed[] = $j;
                 }
             }
 
-            if (count($current_group) > 1) {
-                // Ordena por performance (Master é quem tem mais cliques)
-                usort($current_group, function($a, $b) {
+            if (count($current_cluster) > 1) {
+                // Eleição da Master (Quem tem mais cliques vence)
+                usort($current_cluster, function($a, $b) {
                     return ($b['gsc']['clicks'] ?? 0) - ($a['gsc']['clicks'] ?? 0);
                 });
 
-                $master = $current_group[0];
-                for ($k = 1; $k < count($current_group); $k++) {
-                    $slave = $current_group[$k];
-                    $conf[] = [
-                        'id1' => $slave['id'],
-                        'post1' => $slave['slug'],
-                        'type1' => $slave['type'],
-                        'gsc1' => $slave['gsc'],
-                        'id2' => $master['id'], // Adicionado ID da master para facilitar a resolução
-                        'post2' => $master['slug'],
-                        'type2' => $master['type'],
-                        'gsc2' => $master['gsc'],
-                        'url2' => $master['url']
-                    ];
-                }
+                $master = array_shift($current_cluster);
+                $groups[] = [
+                    'master' => $master,
+                    'slaves' => $current_cluster
+                ];
             }
         }
 
-        wp_send_json_success(['total_posts'=>count($ps), 'conflicts'=>$conf]);
+        wp_send_json_success(['total_posts'=>count($ps), 'groups'=>$groups]);
     }
 
     public function ajax_resolve_issue() {
