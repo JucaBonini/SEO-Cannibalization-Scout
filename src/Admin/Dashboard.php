@@ -313,7 +313,6 @@ class Dashboard {
                     });
                 };
 
-                $('.sts-choice-card').on('click', function() {
                 $('#run-audit-action').on('click', function() {
                     const btn=$(this); const loader=$('#sts-audit-loader'); const res_div=$('#sts-audit-results');
                     const types=$('input[name="post_types[]"]:checked').map(function(){return $(this).val();}).get();
